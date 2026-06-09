@@ -10,6 +10,7 @@ import type {
   SignupRequest,
 } from '../Types/auth.types';
 import { AuthContext } from './AuthContext';
+import { logger } from '../lib/logger';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -26,8 +27,10 @@ function getStoredSession(): AuthSession | null {
 
   try {
     const user = JSON.parse(storedUser) as AuthUser;
+    logger.info('Session restored from localStorage', { email: user.email, role: user.role });
     return { accessToken, refreshToken, user };
   } catch {
+    logger.warn('Corrupt session data in localStorage — clearing');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
@@ -38,7 +41,7 @@ function getStoredSession(): AuthSession | null {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<AuthSession | null>(getStoredSession);
 
-  function storeSession(authSession: AuthSession) {
+  function persistSession(authSession: AuthSession) {
     localStorage.setItem('accessToken', authSession.accessToken);
     localStorage.setItem('refreshToken', authSession.refreshToken);
     localStorage.setItem('user', JSON.stringify(authSession.user));
@@ -46,18 +49,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function login(credentials: LoginRequest) {
+    logger.info('Login attempt', { email: credentials.email });
     const authSession = await loginRequest(credentials);
-    storeSession(authSession);
+    persistSession(authSession);
+    logger.info('Login successful', { email: authSession.user.email, role: authSession.user.role });
     return authSession;
   }
 
-  async function signup(details: SignupRequest) {
-    const authSession = await signupRequest(details);
-    storeSession(authSession);
-    return authSession;
+  function loginWithSession(authSession: AuthSession) {
+    persistSession(authSession);
+    logger.info('Session set directly', { email: authSession.user.email, role: authSession.user.role });
   }
 
   function logout() {
+    logger.info('User logged out', { email: session?.user.email });
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
@@ -71,7 +76,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         user: session?.user ?? null,
         isAuthenticated: Boolean(session),
         login,
-        signup,
+        loginWithSession,
         logout,
       }}
     >

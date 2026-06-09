@@ -1,127 +1,172 @@
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSignupSubmitForm } from '../Hooks/auth/UseSignupSubmitForm';
-import type { SignupRole } from '../Types/auth.types';
+import { useAuth } from '../Hooks/auth/UseAuth';
+import { getRoleRedirectPath } from '../lib/roleRedirect';
+import logo from '../assets/logo.png';
 
 function Signup() {
-  const {
-    errors,
-    isSubmitting,
-    serverError,
-    submitForm,
-    updateField,
-    values,
-  } = useSignupSubmitForm();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { errors, isSubmitting, serverError, submitForm, updateField, values } = useSignupSubmitForm();
+
+  useEffect(() => {
+    if (user) {
+      navigate(getRoleRedirectPath(user.role), { replace: true });
+    }
+  }, [navigate, user]);
 
   return (
-    <main className="grid min-h-screen place-items-center bg-slate-100 p-6">
-      <section className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-900/5">
-        <header className="mb-7 text-center">
-          <h1 className="mb-2 text-3xl font-semibold text-slate-900">
-            Create Account
-          </h1>
-          <p className="text-slate-500">Sign up to get started</p>
-        </header>
+    <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10" dir="rtl">
+      <div className="w-full max-w-sm space-y-8">
+        {/* Logo */}
+        <div className="text-center space-y-2">
+          <img src={logo} alt="مشروع مطر" className="h-16 w-auto mx-auto" />
+          <h1 className="text-2xl font-bold text-gray-900">مشروع مطر</h1>
+          <p className="text-gray-500 text-sm">إنشاء حساب جديد</p>
+        </div>
 
-        {serverError && (
-          <p
-            className="mb-5 rounded-lg bg-red-50 px-3 py-2.5 text-sm text-red-700"
-            role="alert"
-          >
-            {serverError}
-          </p>
-        )}
+        <div className="bg-white rounded-2xl shadow-sm p-8 space-y-5">
+          {serverError && (
+            <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              {serverError}
+            </div>
+          )}
 
-        <form className="grid gap-5" onSubmit={submitForm} noValidate>
-          <label className="grid gap-2 text-left text-sm font-semibold text-slate-700">
-            Name
-            <input
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-normal text-slate-900 outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 aria-invalid:border-red-600"
-              type="text"
-              value={values.name}
-              onChange={(event) => updateField('name', event.target.value)}
-              autoComplete="name"
-              aria-invalid={Boolean(errors.name)}
-            />
-            {errors.name && (
-              <span className="text-xs font-normal text-red-600">
-                {errors.name}
-              </span>
-            )}
-          </label>
+          <form onSubmit={submitForm} className="space-y-5" noValidate aria-label="نموذج إنشاء حساب">
+            {/* Name */}
+            <div className="space-y-1">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                الاسم الكامل
+              </label>
+              <input
+                id="name"
+                type="text"
+                value={values.name}
+                onChange={(e) => updateField('name', e.target.value)}
+                placeholder="محمد أحمد"
+                autoComplete="name"
+                aria-invalid={Boolean(errors.name)}
+                aria-describedby={errors.name ? 'name-error' : undefined}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              {errors.name && (
+                <p id="name-error" className="text-sm text-red-600" role="alert">{errors.name}</p>
+              )}
+            </div>
 
-          <label className="grid gap-2 text-left text-sm font-semibold text-slate-700">
-            Email
-            <input
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-normal text-slate-900 outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 aria-invalid:border-red-600"
-              type="email"
-              value={values.email}
-              onChange={(event) => updateField('email', event.target.value)}
-              autoComplete="email"
-              aria-invalid={Boolean(errors.email)}
-            />
-            {errors.email && (
-              <span className="text-xs font-normal text-red-600">
-                {errors.email}
-              </span>
-            )}
-          </label>
+            {/* Email */}
+            <div className="space-y-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                البريد الإلكتروني
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={values.email}
+                onChange={(e) => updateField('email', e.target.value)}
+                placeholder="you@example.com"
+                autoComplete="email"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? 'email-error' : undefined}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              {errors.email && (
+                <p id="email-error" className="text-sm text-red-600" role="alert">{errors.email}</p>
+              )}
+            </div>
 
-          <label className="grid gap-2 text-left text-sm font-semibold text-slate-700">
-            Password
-            <input
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-normal text-slate-900 outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 aria-invalid:border-red-600"
-              type="password"
-              value={values.password}
-              onChange={(event) => updateField('password', event.target.value)}
-              autoComplete="new-password"
-              aria-invalid={Boolean(errors.password)}
-            />
-            {errors.password && (
-              <span className="text-xs font-normal text-red-600">
-                {errors.password}
-              </span>
-            )}
-          </label>
+            {/* Password */}
+            <div className="space-y-1">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                كلمة المرور
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={values.password}
+                onChange={(e) => updateField('password', e.target.value)}
+                placeholder="••••••••"
+                autoComplete="new-password"
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby={errors.password ? 'password-error' : undefined}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              {errors.password && (
+                <p id="password-error" className="text-sm text-red-600" role="alert">{errors.password}</p>
+              )}
+            </div>
 
-          <label className="grid gap-2 text-left text-sm font-semibold text-slate-700">
-            Account type
-            <select
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-normal text-slate-900 outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 aria-invalid:border-red-600"
-              value={values.role}
-              onChange={(event) =>
-                updateField('role', event.target.value as SignupRole)
-              }
-              aria-invalid={Boolean(errors.role)}
+            {/* Role */}
+            <div className="space-y-2">
+              <p className="block text-sm font-medium text-gray-700">نوع الحساب</p>
+              <div className="grid grid-cols-2 gap-3">
+                <label
+                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+                    values.role === 'volunteer'
+                      ? 'border-primary-500 bg-primary-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value="volunteer"
+                    checked={values.role === 'volunteer'}
+                    onChange={() => updateField('role', 'volunteer')}
+                    className="sr-only"
+                  />
+                  <span className="text-2xl" aria-hidden="true">🤝</span>
+                  <span className="text-sm font-medium text-gray-800 text-center">متطوع</span>
+                  <span className="text-xs text-gray-500 text-center">أريد المساهمة في تحويل الكتب</span>
+                </label>
+
+                <label
+                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+                    values.role === 'visually_impired'
+                      ? 'border-teal-500 bg-teal-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value="visually_impired"
+                    checked={values.role === 'visually_impired'}
+                    onChange={() => updateField('role', 'visually_impired')}
+                    className="sr-only"
+                  />
+                  <span className="text-2xl" aria-hidden="true">📚</span>
+                  <span className="text-sm font-medium text-gray-800 text-center">مستفيد</span>
+                  <span className="text-xs text-gray-500 text-center">أحتاج مواد تعليمية مسموعة</span>
+                </label>
+              </div>
+              {errors.role && (
+                <p className="text-sm text-red-600" role="alert">{errors.role}</p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              aria-busy={isSubmitting}
+              className="w-full px-4 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed transition-colors min-h-[48px] flex items-center justify-center gap-2"
             >
-              <option value="volunteer">Volunteer</option>
-              <option value="visually_impired">Visually impaired</option>
-            </select>
-            {errors.role && (
-              <span className="text-xs font-normal text-red-600">
-                {errors.role}
-              </span>
-            )}
-          </label>
+              {isSubmitting && (
+                <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+              )}
+              {isSubmitting ? 'جاري إنشاء الحساب...' : 'إنشاء الحساب'}
+            </button>
+          </form>
 
-          <button
-            className="cursor-pointer rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-            type="submit"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Creating account...' : 'Sign Up'}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-slate-500">
-          Already have an account?{' '}
-          <Link
-            className="font-semibold text-blue-600 hover:underline"
-            to="/login"
-          >
-            Sign in
-          </Link>
-        </p>
-      </section>
+          <p className="text-center text-sm text-gray-500">
+            لديك حساب بالفعل؟{' '}
+            <Link to="/login" className="text-primary-600 hover:underline font-medium">
+              تسجيل الدخول
+            </Link>
+          </p>
+        </div>
+      </div>
     </main>
   );
 }

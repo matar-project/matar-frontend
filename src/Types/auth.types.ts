@@ -3,13 +3,11 @@ export interface LoginRequest {
   password: string;
 }
 
-export type SignupRole = 'volunteer' | 'visually_impired';
-
 export interface SignupRequest {
   name: string;
   email: string;
   password: string;
-  role: SignupRole;
+  role: 'volunteer' | 'visually_impired';
 }
 
 export interface AuthUser {
@@ -30,7 +28,7 @@ export interface AuthContextValue {
   user: AuthUser | null;
   isAuthenticated: boolean;
   login: (credentials: LoginRequest) => Promise<AuthSession>;
-  signup: (details: SignupRequest) => Promise<AuthSession>;
+  loginWithSession: (session: AuthSession) => void;
   logout: () => void;
 }
 

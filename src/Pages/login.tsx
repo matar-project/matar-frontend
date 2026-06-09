@@ -1,100 +1,100 @@
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLoginSubmitForm } from '../Hooks/auth/UseLoginSubmitForm';
+import { useAuth } from '../Hooks/auth/UseAuth';
+import { getRoleRedirectPath } from '../lib/roleRedirect';
+import logo from '../assets/logo.png';
 
 function Login() {
   const navigate = useNavigate();
-  const {
-    errors,
-    isSubmitting,
-    serverError,
-    session,
-    submitForm,
-    updateField,
-    values,
-  } = useLoginSubmitForm();
+  const { user } = useAuth();
+  const { errors, isSubmitting, serverError, submitForm, updateField, values } = useLoginSubmitForm();
 
   useEffect(() => {
-    if (session) {
-      navigate('/', { replace: true });
+    if (user) {
+      navigate(getRoleRedirectPath(user.role), { replace: true });
     }
-  }, [navigate, session]);
+  }, [navigate, user]);
 
   return (
-    <main className="grid min-h-screen place-items-center bg-slate-100 p-6">
-      <section className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-900/5">
-        <header className="mb-7 text-center">
-          <h1 className="mb-2 text-3xl font-semibold text-slate-900">
-            Login Portal
-          </h1>
-          <p className="text-slate-500">Sign in to your account</p>
-        </header>
+    <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4" dir="rtl">
+      <div className="w-full max-w-sm space-y-8">
+        {/* Logo */}
+        <div className="text-center space-y-2">
+          <img src={logo} alt="مشروع مطر" className="h-16 w-auto mx-auto" />
+          <h1 className="text-2xl font-bold text-gray-900">مشروع مطر</h1>
+          <p className="text-gray-500 text-sm">لوحة تحكم الإدارة</p>
+        </div>
 
-        {serverError && (
-          <p
-            className="mb-5 rounded-lg bg-red-50 px-3 py-2.5 text-sm text-red-700"
-            role="alert"
-          >
-            {serverError}
+        <div className="bg-white rounded-2xl shadow-sm p-8 space-y-5">
+          {serverError && (
+            <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              {serverError}
+            </div>
+          )}
+
+          <form onSubmit={submitForm} className="space-y-5" noValidate aria-label="نموذج تسجيل الدخول">
+            <div className="space-y-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                البريد الإلكتروني
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={values.email}
+                onChange={(e) => updateField('email', e.target.value)}
+                placeholder="admin@example.com"
+                autoComplete="email"
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? 'email-error' : undefined}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              {errors.email && (
+                <p id="email-error" className="text-sm text-red-600" role="alert">{errors.email}</p>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                كلمة المرور
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={values.password}
+                onChange={(e) => updateField('password', e.target.value)}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby={errors.password ? 'password-error' : undefined}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              {errors.password && (
+                <p id="password-error" className="text-sm text-red-600" role="alert">{errors.password}</p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              aria-busy={isSubmitting}
+              className="w-full px-4 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed transition-colors min-h-[48px] flex items-center justify-center gap-2"
+            >
+              {isSubmitting && (
+                <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+              )}
+              {isSubmitting ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-500">
+            ليس لديك حساب؟{' '}
+            <Link to="/signup" className="text-primary-600 hover:underline font-medium">
+              إنشاء حساب
+            </Link>
           </p>
-        )}
-
-        <form className="grid gap-5" onSubmit={submitForm} noValidate>
-          <label className="grid gap-2 text-left text-sm font-semibold text-slate-700">
-            Email
-            <input
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-normal text-slate-900 outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 aria-invalid:border-red-600"
-              type="email"
-              value={values.email}
-              onChange={(event) => updateField('email', event.target.value)}
-              placeholder="Enter your email"
-              autoComplete="email"
-              aria-invalid={Boolean(errors.email)}
-            />
-            {errors.email && (
-              <span className="text-xs font-normal text-red-600">
-                {errors.email}
-              </span>
-            )}
-          </label>
-
-          <label className="grid gap-2 text-left text-sm font-semibold text-slate-700">
-            Password
-            <input
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 font-normal text-slate-900 outline-none transition focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 aria-invalid:border-red-600"
-              type="password"
-              value={values.password}
-              onChange={(event) => updateField('password', event.target.value)}
-              placeholder="Enter your password"
-              autoComplete="current-password"
-              aria-invalid={Boolean(errors.password)}
-            />
-            {errors.password && (
-              <span className="text-xs font-normal text-red-600">
-                {errors.password}
-              </span>
-            )}
-          </label>
-
-          <button
-            className="cursor-pointer rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-            type="submit"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-slate-500">
-          Do not have an account?{' '}
-          <Link
-            className="font-semibold text-blue-600 hover:underline"
-            to="/signup"
-          >
-            Create an account
-          </Link>
-        </p>
-      </section>
+        </div>
+      </div>
     </main>
   );
 }
