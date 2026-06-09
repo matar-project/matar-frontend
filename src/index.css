@@ -1,10 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@300;400;500;600;700;800;900&display=swap');
+
 :root {
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  color: #172033;
-  background: #f4f7fb;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+  font-family: 'Noto Kufi Arabic', 'Segoe UI', Tahoma, sans-serif;
+  color: #111827;
+  background: #f9fafb;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -13,4 +16,29 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  direction: rtl;
+}
+
+/* Ensure focus rings are visible for keyboard navigation */
+:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Screen-reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
