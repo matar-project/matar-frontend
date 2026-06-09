@@ -6,42 +6,42 @@ import { useAuth } from "./UseAuth";
 import { logger } from "../../lib/logger";
 
 const initialValues: LoginRequest = {
-  email: "",
-  password: "",
+  email: '',
+  password: '',
 };
 
 function getServerError(error: unknown): string {
   if (!axios.isAxiosError(error)) {
-    return "Unable to sign in. Please try again.";
+    return 'Unable to sign in. Please try again.';
   }
 
   const message = error.response?.data?.message;
 
   if (Array.isArray(message)) {
-    return message.join(", ");
+    return message.join(', ');
   }
 
-  return typeof message === "string"
+  return typeof message === 'string'
     ? message
-    : "Unable to sign in. Please try again.";
+    : 'Unable to sign in. Please try again.';
 }
 
 export function useLoginSubmitForm() {
   const { login, session } = useAuth();
   const [values, setValues] = useState<LoginRequest>(initialValues);
   const [errors, setErrors] = useState<LoginFieldErrors>({});
-  const [serverError, setServerError] = useState("");
+  const [serverError, setServerError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function updateField(field: keyof LoginRequest, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
-    setServerError("");
+    setServerError('');
   }
 
   async function submitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setServerError("");
+    setServerError('');
 
     const result = loginSchema.safeParse(values);
 

@@ -10,3 +10,8 @@ export async function signup(data: SignupRequest): Promise<AuthSession> {
   const response = await apiClient.post<AuthSession>('/auth/signup', data);
   return response.data;
 }
+
+export async function signup(details: SignupRequest): Promise<AuthSession> {
+  const response = await api.post<AuthSession>('/auth/signup', details);
+  return response.data;
+}

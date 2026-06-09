@@ -1,9 +1,13 @@
 import { useState, type ReactNode } from 'react';
-import { login as loginRequest } from '../api/auth.api';
+import {
+  login as loginRequest,
+  signup as signupRequest,
+} from '../api/auth.api';
 import type {
   AuthSession,
   AuthUser,
   LoginRequest,
+  SignupRequest,
 } from '../Types/auth.types';
 import { AuthContext } from './AuthContext';
 import { logger } from '../lib/logger';
