@@ -1,41 +1,39 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
-import { GuestRoute } from './Components/GuestRoute';
-import { AdminRoute } from './Components/AdminRoute';
-import { VolunteerRoute } from './Components/VolunteerRoute';
-import { VisuallyImpairedRoute } from './Components/VisuallyImpairedRoute';
-import { PublicLayout } from './Components/layout/PublicLayout';
-import { AdminLayout } from './Components/layout/AdminLayout';
-import { VolunteerLayout } from './Components/layout/VolunteerLayout';
-import { VisuallyImpairedLayout } from './Components/layout/VisuallyImpairedLayout';
+import { Navigate, Route, Routes } from "react-router-dom";
+import { GuestRoute } from "./Components/GuestRoute";
+import { AdminRoute } from "./Components/AdminRoute";
+import { VolunteerRoute } from "./Components/VolunteerRoute";
+import { VisuallyImpairedRoute } from "./Components/VisuallyImpairedRoute";
+import { PublicLayout } from "./Components/layout/PublicLayout";
+import { AdminLayout } from "./Components/layout/AdminLayout";
+import { VolunteerLayout } from "./Components/layout/VolunteerLayout";
+import { VisuallyImpairedLayout } from "./Components/layout/VisuallyImpairedLayout";
 
 // Public pages
-import Home from './Pages/public/Home';
-import About from './Pages/public/About';
-import RequestHelp from './Pages/public/RequestHelp';
-import BookRequest from './Pages/public/BookRequest';
-import Volunteer from './Pages/public/Volunteer';
-import Opportunities from './Pages/public/Opportunities';
-import Library from './Pages/public/Library';
-import Contact from './Pages/public/Contact';
+import Home from "./Pages/public/Home";
+import About from "./Pages/public/About";
+import Contact from "./Pages/public/Contact";
 
 // Admin pages
-import AdminDashboard from './Pages/admin/AdminDashboard';
-import AdminRequests from './Pages/admin/AdminRequests';
-import AdminVolunteers from './Pages/admin/AdminVolunteers';
-import AdminLibrary from './Pages/admin/AdminLibrary';
-import AdminSettings from './Pages/admin/AdminSettings';
+import AdminDashboard from "./Pages/admin/AdminDashboard";
+import AdminRequests from "./Pages/admin/AdminRequests";
+import AdminVolunteers from "./Pages/admin/AdminVolunteers";
+import AdminLibrary from "./Pages/admin/AdminLibrary";
+import AdminSettings from "./Pages/admin/AdminSettings";
 
 // Volunteer pages
-import VolunteerDashboard from './Pages/volunteer/VolunteerDashboard';
-import VolunteerOpportunities from './Pages/volunteer/VolunteerOpportunities';
+import VolunteerDashboard from "./Pages/volunteer/VolunteerDashboard";
+import VolunteerOpportunities from "./Pages/volunteer/VolunteerOpportunities";
+import VolunteerApplication from "./Pages/volunteer/VolunteerApplication";
 
 // Visually impaired pages
-import VIDashboard from './Pages/visually-impaired/VIDashboard';
-import VILibrary from './Pages/visually-impaired/VILibrary';
+import VIDashboard from "./Pages/visually-impaired/VIDashboard";
+import VILibrary from "./Pages/visually-impaired/VILibrary";
+import VIRequestHelp from "./Pages/visually-impaired/VIRequestHelp";
+import BookRequest from "./Pages/visually-impaired/BookRequest";
 
 // Auth
-import Login from './Pages/login';
-import Signup from './Pages/signup';
+import Login from "./Pages/login";
+import Signup from "./Pages/signup";
 
 function App() {
   return (
@@ -48,13 +46,10 @@ function App() {
 
       {/* Public website */}
       <Route element={<PublicLayout />}>
-        <Route path="/" element={<Home />} />
+        <Route element={<GuestRoute />}>
+          <Route path="/" element={<Home />} />
+        </Route>
         <Route path="/about" element={<About />} />
-        <Route path="/request-help" element={<RequestHelp />} />
-        <Route path="/book-request" element={<BookRequest />} />
-        <Route path="/volunteer" element={<Volunteer />} />
-        <Route path="/opportunities" element={<Opportunities />} />
-        <Route path="/library" element={<Library />} />
         <Route path="/contact" element={<Contact />} />
       </Route>
 
@@ -73,7 +68,15 @@ function App() {
       <Route element={<VolunteerRoute />}>
         <Route element={<VolunteerLayout />}>
           <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
-          <Route path="/volunteer-dashboard/opportunities" element={<VolunteerOpportunities />} />
+          <Route path="/volunteer-dashboard/library" element={<VILibrary />} />
+          <Route
+            path="/volunteer-dashboard/opportunities"
+            element={<VolunteerOpportunities />}
+          />
+          <Route
+            path="/volunteer-dashboard/application"
+            element={<VolunteerApplication />}
+          />
         </Route>
       </Route>
 
@@ -82,6 +85,8 @@ function App() {
         <Route element={<VisuallyImpairedLayout />}>
           <Route path="/vi" element={<VIDashboard />} />
           <Route path="/vi/library" element={<VILibrary />} />
+          <Route path="/vi/requests" element={<VIRequestHelp />} />
+          <Route path="/vi/book-request" element={<BookRequest />} />
         </Route>
       </Route>
 

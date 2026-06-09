@@ -4,14 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { requestsApi, type CreateRequestDto } from '../../api/requests';
-import { InputField, TextareaField, SelectField } from '../../Components/ui/FormField';
+import { TextareaField, SelectField } from '../../Components/ui/FormField';
 import { Button } from '../../Components/ui/Button';
+import { useAuth } from '../../Hooks/auth/UseAuth';
 
 const schema = z.object({
-  fullName: z.string().min(2, 'الاسم مطلوب'),
-  phone: z.string().min(7, 'رقم الهاتف مطلوب'),
-  email: z.string().email('بريد إلكتروني غير صالح').optional().or(z.literal('')),
-  city: z.string().min(2, 'المدينة مطلوبة'),
   requestType: z.string().min(1, 'نوع الطلب مطلوب'),
   details: z.string().min(10, 'يرجى تفصيل طلبك (10 أحرف على الأقل)'),
 });
@@ -26,11 +23,12 @@ const REQUEST_TYPES = [
   { value: 'OTHER', label: 'أخرى' },
 ];
 
-export default function RequestHelp() {
+export default function VIRequestHelp() {
+  const { user } = useAuth();
   const [submitted, setSubmitted] = useState(false);
-
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
+    defaultValues: { requestType: '', details: '' },
   });
 
   const mutation = useMutation({
@@ -41,14 +39,10 @@ export default function RequestHelp() {
   if (submitted) {
     return (
       <div className="max-w-xl mx-auto px-4 py-20 text-center space-y-6" role="status" aria-live="polite">
-        <div className="text-6xl" aria-hidden="true">✅</div>
+        <div className="text-6xl" aria-hidden="true">✓</div>
         <h2 className="text-2xl font-bold text-gray-900">تم إرسال طلبك بنجاح</h2>
-        <p className="text-gray-600">
-          سيتواصل معك فريق مطر في أقرب وقت ممكن. شكراً لثقتك بنا.
-        </p>
-        <Button variant="outline" onClick={() => setSubmitted(false)}>
-          إرسال طلب آخر
-        </Button>
+        <p className="text-gray-600">سيتواصل معك فريق مطر في أقرب وقت ممكن. شكراً لثقتك بنا.</p>
+        <Button variant="outline" onClick={() => setSubmitted(false)}>إرسال طلب آخر</Button>
       </div>
     );
   }
@@ -61,49 +55,16 @@ export default function RequestHelp() {
       </header>
 
       <form
-        onSubmit={handleSubmit((data) => mutation.mutate(data as CreateRequestDto))}
+        onSubmit={handleSubmit((data) => mutation.mutate(data))}
         className="bg-white rounded-2xl shadow-sm p-6 md:p-8 space-y-6"
         noValidate
         aria-label="نموذج طلب المساعدة"
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <InputField
-            id="fullName"
-            label="الاسم الكامل"
-            required
-            placeholder="محمد أحمد"
-            error={errors.fullName?.message}
-            {...register('fullName')}
-          />
-          <InputField
-            id="phone"
-            label="رقم الهاتف"
-            required
-            type="tel"
-            placeholder="07xxxxxxxx"
-            error={errors.phone?.message}
-            {...register('phone')}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <InputField
-            id="email"
-            label="البريد الإلكتروني"
-            type="email"
-            placeholder="example@email.com"
-            error={errors.email?.message}
-            hint="اختياري"
-            {...register('email')}
-          />
-          <InputField
-            id="city"
-            label="المدينة"
-            required
-            placeholder="عمّان"
-            error={errors.city?.message}
-            {...register('city')}
-          />
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700 space-y-1">
+          <p><span className="font-medium">الاسم:</span> {user?.name}</p>
+          <p><span className="font-medium">الهاتف:</span> <span dir="ltr">{user?.phone}</span></p>
+          <p><span className="font-medium">الدولة والمدينة:</span> {user?.country}، {user?.city}</p>
+          <p className="text-gray-500">سنستخدم هذه البيانات للتواصل معك بشأن الطلب.</p>
         </div>
 
         <SelectField
@@ -114,8 +75,8 @@ export default function RequestHelp() {
           {...register('requestType')}
         >
           <option value="">-- اختر نوع الطلب --</option>
-          {REQUEST_TYPES.map((t) => (
-            <option key={t.value} value={t.value}>{t.label}</option>
+          {REQUEST_TYPES.map((type) => (
+            <option key={type.value} value={type.value}>{type.label}</option>
           ))}
         </SelectField>
 
@@ -130,7 +91,7 @@ export default function RequestHelp() {
 
         {mutation.isError && (
           <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-            حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مجدداً.
+            تعذر إرسال الطلب. تأكد من اكتمال بيانات الاتصال في حسابك ثم حاول مجدداً.
           </div>
         )}
 

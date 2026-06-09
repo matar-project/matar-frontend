@@ -1,12 +1,7 @@
 import { apiClient } from './client';
 
 export interface CreateVolunteerDto {
-  name: string;
-  phone: string;
-  email?: string;
-  city: string;
   interests: string[];
-  preferredContact: string;
 }
 
 export const volunteersApi = {

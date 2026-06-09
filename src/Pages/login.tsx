@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLoginSubmitForm } from '../Hooks/auth/UseLoginSubmitForm';
 import { useAuth } from '../Hooks/auth/UseAuth';
@@ -15,6 +15,14 @@ function Login() {
       navigate(getRoleRedirectPath(user.role), { replace: true });
     }
   }, [navigate, user]);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    const session = await submitForm(event);
+
+    if (session) {
+      navigate(getRoleRedirectPath(session.user.role), { replace: true });
+    }
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4" dir="rtl">
@@ -33,7 +41,7 @@ function Login() {
             </div>
           )}
 
-          <form onSubmit={submitForm} className="space-y-5" noValidate aria-label="نموذج تسجيل الدخول">
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate aria-label="نموذج تسجيل الدخول">
             <div className="space-y-1">
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 البريد الإلكتروني

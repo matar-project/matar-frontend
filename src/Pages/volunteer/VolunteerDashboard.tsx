@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../Hooks/auth/UseAuth';
 import { opportunitiesApi, type Opportunity } from '../../api/opportunities';
-import { BookOpen, Clock, CheckCircle } from 'lucide-react';
+import { BookOpen, Clock, CheckCircle, Library } from 'lucide-react';
 
 function OpportunityCard({ opp }: { opp: Opportunity }) {
   const statusLabel =
@@ -54,6 +55,19 @@ export default function VolunteerDashboard() {
           شكراً لتطوعك مع مشروع مطر. إليك الفرص المتاحة حالياً.
         </p>
       </div>
+
+      <Link
+        to="/volunteer-dashboard/library"
+        className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4 hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+      >
+        <div className="p-3 rounded-xl bg-purple-500">
+          <Library size={22} className="text-white" aria-hidden="true" />
+        </div>
+        <div>
+          <p className="font-semibold text-gray-900 text-sm">المكتبة</p>
+          <p className="text-xs text-gray-500 mt-0.5">تصفح الكتب والمواد المتاحة</p>
+        </div>
+      </Link>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">

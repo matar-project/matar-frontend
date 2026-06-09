@@ -8,9 +8,6 @@ import logo from '../../assets/logo.png';
 const navLinks = [
   { to: '/', label: 'الرئيسية' },
   { to: '/about', label: 'عن مطر' },
-  { to: '/library', label: 'المكتبة' },
-  { to: '/opportunities', label: 'الفرص' },
-  { to: '/volunteer', label: 'تطوع' },
   { to: '/contact', label: 'تواصل معنا' },
 ];
 
@@ -19,13 +16,19 @@ export function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setOpen(false);
-    logout();
+    await logout();
     navigate('/');
   };
 
   const dashboardPath = user ? getRoleRedirectPath(user.role) : '/login';
+  const canRequestHelp = user?.role === 'visually_impired';
+  const logoPath = isAuthenticated ? dashboardPath : '/';
+  const visibleNavLinks = [
+    ...(isAuthenticated ? navLinks.slice(1, 2) : navLinks.slice(0, 2)),
+    ...navLinks.slice(2),
+  ];
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50" role="banner">
@@ -34,14 +37,14 @@ export function Navbar() {
         aria-label="التنقل الرئيسي"
       >
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 rounded-md">
+        <Link to={logoPath} className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 rounded-md">
           <img src={logo} alt="مشروع مطر" className="h-10 w-auto" />
           <span className="text-primary-700 font-bold text-lg hidden sm:inline">مشروع مطر</span>
         </Link>
 
         {/* Desktop nav */}
         <ul className="hidden md:flex items-center gap-1" role="list">
-          {navLinks.map((link) => (
+          {visibleNavLinks.map((link) => (
             <li key={link.to}>
               <NavLink
                 to={link.to}
@@ -62,12 +65,14 @@ export function Navbar() {
 
         {/* CTA buttons — desktop */}
         <div className="hidden md:flex items-center gap-2">
-          <Link
-            to="/request-help"
-            className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 transition-colors"
-          >
-            اطلب مساعدة
-          </Link>
+          {canRequestHelp && (
+            <Link
+              to="/vi/requests"
+              className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 transition-colors"
+            >
+              اطلب مساعدة
+            </Link>
+          )}
 
           {isAuthenticated ? (
             <>
@@ -115,7 +120,7 @@ export function Navbar() {
       {open && (
         <div id="mobile-menu" className="md:hidden border-t border-gray-200 bg-white">
           <ul className="px-4 py-3 space-y-1" role="list">
-            {navLinks.map((link) => (
+            {visibleNavLinks.map((link) => (
               <li key={link.to}>
                 <NavLink
                   to={link.to}
@@ -133,15 +138,17 @@ export function Navbar() {
                 </NavLink>
               </li>
             ))}
-            <li>
-              <Link
-                to="/request-help"
-                onClick={() => setOpen(false)}
-                className="block px-3 py-2 mt-2 bg-primary-600 text-white text-base font-medium rounded-lg text-center"
-              >
-                اطلب مساعدة
-              </Link>
-            </li>
+            {canRequestHelp && (
+              <li>
+                <Link
+                  to="/vi/requests"
+                  onClick={() => setOpen(false)}
+                  className="block px-3 py-2 mt-2 bg-primary-600 text-white text-base font-medium rounded-lg text-center"
+                >
+                  اطلب مساعدة
+                </Link>
+              </li>
+            )}
             <li>
               {isAuthenticated ? (
                 <div className="space-y-1 pt-1 border-t border-gray-100 mt-2">

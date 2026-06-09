@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { BookOpen, Users, CheckCircle, Library } from 'lucide-react';
 import { requestsApi } from '../../api/requests';
 import { Button } from '../../Components/ui/Button';
+import { useAuth } from '../../Hooks/auth/UseAuth';
 
 function StatCard({ icon: Icon, value, label }: { icon: any; value: number | string; label: string }) {
   return (
@@ -21,7 +22,10 @@ const stories = [
 ];
 
 export default function Home() {
+  const { user } = useAuth();
   const { data: stats } = useQuery({ queryKey: ['stats'], queryFn: requestsApi.getStats });
+  const canRequestHelp = user?.role === 'visually_impired';
+  const canVolunteer = user?.role === 'volunteer';
 
   return (
     <div>
@@ -46,20 +50,24 @@ export default function Home() {
             إعطاء المكفوفين الفرصة التعليمية والثقافية المتكافئة
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-            <Link
-              to="/request-help"
-              className="px-7 py-4 text-lg font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white bg-white text-primary-700 hover:bg-primary-50 inline-flex items-center justify-center"
-              aria-label="اطلب مساعدة من مشروع مطر"
-            >
-              اطلب مساعدة
-            </Link>
-            <Link
-              to="/volunteer"
-              className="px-7 py-4 text-lg font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white border-2 border-white text-white hover:bg-primary-700 inline-flex items-center justify-center"
-              aria-label="انضم كمتطوع في مشروع مطر"
-            >
-              تطوع معنا
-            </Link>
+            {canRequestHelp && (
+              <Link
+                to="/vi/requests"
+                className="px-7 py-4 text-lg font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white bg-white text-primary-700 hover:bg-primary-50 inline-flex items-center justify-center"
+                aria-label="اطلب مساعدة من مشروع مطر"
+              >
+                اطلب مساعدة
+              </Link>
+            )}
+            {canVolunteer && (
+              <Link
+                to="/volunteer-dashboard/application"
+                className="px-7 py-4 text-lg font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white border-2 border-white text-white hover:bg-primary-700 inline-flex items-center justify-center"
+                aria-label="انضم كمتطوع في مشروع مطر"
+              >
+                تطوع معنا
+              </Link>
+            )}
           </div>
         </div>
       </section>
@@ -135,18 +143,22 @@ export default function Home() {
             سواء كنت تبحث عن مساعدة أو تريد تقديمها — مطر هو مكانك.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link
-              to="/request-help"
-              className="px-8 py-4 bg-white text-secondary-700 font-semibold rounded-xl hover:bg-secondary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors text-center"
-            >
-              اطلب مساعدة
-            </Link>
-            <Link
-              to="/volunteer"
-              className="px-8 py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-secondary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors text-center"
-            >
-              تطوع معنا
-            </Link>
+            {canRequestHelp && (
+              <Link
+                to="/vi/requests"
+                className="px-8 py-4 bg-white text-secondary-700 font-semibold rounded-xl hover:bg-secondary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors text-center"
+              >
+                اطلب مساعدة
+              </Link>
+            )}
+            {canVolunteer && (
+              <Link
+                to="/volunteer-dashboard/application"
+                className="px-8 py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-secondary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors text-center"
+              >
+                تطوع معنا
+              </Link>
+            )}
           </div>
         </div>
       </section>

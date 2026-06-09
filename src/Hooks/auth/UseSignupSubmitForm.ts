@@ -9,6 +9,9 @@ import { logger } from '../../lib/logger';
 const initialValues: SignupRequest = {
   name: '',
   email: '',
+  phone: '',
+  country: '',
+  city: '',
   password: '',
   role: 'volunteer',
 };
@@ -45,6 +48,9 @@ export function useSignupSubmitForm() {
       setErrors({
         name: fieldErrors.name?.[0],
         email: fieldErrors.email?.[0],
+        phone: fieldErrors.phone?.[0],
+        country: fieldErrors.country?.[0],
+        city: fieldErrors.city?.[0],
         password: fieldErrors.password?.[0],
         role: fieldErrors.role?.[0],
       });
@@ -58,6 +64,7 @@ export function useSignupSubmitForm() {
       const session = await signupRequest(result.data);
       loginWithSession(session);
       logger.info('Signup successful', { email: result.data.email, role: result.data.role });
+      return session;
     } catch (error) {
       const msg = getServerError(error);
       logger.error('Signup failed', msg);
