@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 import { loginSchema } from "../../schema/login.schema";
 import type { LoginFieldErrors, LoginRequest } from "../../Types/auth.types";
 import { useAuth } from "./UseAuth";
+import { logger } from "../../lib/logger";
 
 const initialValues: LoginRequest = {
   email: "",
@@ -46,6 +47,7 @@ export function useLoginSubmitForm() {
 
     if (!result.success) {
       const fieldErrors = result.error.flatten().fieldErrors;
+      logger.warn('Login form validation failed', fieldErrors);
       setErrors({
         email: fieldErrors.email?.[0],
         password: fieldErrors.password?.[0],
@@ -59,7 +61,9 @@ export function useLoginSubmitForm() {
     try {
       await login(result.data);
     } catch (error) {
-      setServerError(getServerError(error));
+      const msg = getServerError(error);
+      logger.error('Login failed', msg);
+      setServerError(msg);
     } finally {
       setIsSubmitting(false);
     }

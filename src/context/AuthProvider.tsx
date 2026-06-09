@@ -6,6 +6,7 @@ import type {
   LoginRequest,
 } from '../Types/auth.types';
 import { AuthContext } from './AuthContext';
+import { logger } from '../lib/logger';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -22,8 +23,10 @@ function getStoredSession(): AuthSession | null {
 
   try {
     const user = JSON.parse(storedUser) as AuthUser;
+    logger.info('Session restored from localStorage', { email: user.email, role: user.role });
     return { accessToken, refreshToken, user };
   } catch {
+    logger.warn('Corrupt session data in localStorage — clearing');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
@@ -35,17 +38,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<AuthSession | null>(getStoredSession);
 
   async function login(credentials: LoginRequest) {
+    logger.info('Login attempt', { email: credentials.email });
     const authSession = await loginRequest(credentials);
 
     localStorage.setItem('accessToken', authSession.accessToken);
     localStorage.setItem('refreshToken', authSession.refreshToken);
     localStorage.setItem('user', JSON.stringify(authSession.user));
     setSession(authSession);
+    logger.info('Login successful', { email: authSession.user.email, role: authSession.user.role });
 
     return authSession;
   }
 
   function logout() {
+    logger.info('User logged out', { email: session?.user.email });
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
