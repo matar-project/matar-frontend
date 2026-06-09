@@ -1,9 +1,13 @@
 import { useState, type ReactNode } from 'react';
-import { login as loginRequest } from '../api/auth.api';
+import {
+  login as loginRequest,
+  signup as signupRequest,
+} from '../api/auth.api';
 import type {
   AuthSession,
   AuthUser,
   LoginRequest,
+  SignupRequest,
 } from '../Types/auth.types';
 import { AuthContext } from './AuthContext';
 
@@ -34,14 +38,22 @@ function getStoredSession(): AuthSession | null {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<AuthSession | null>(getStoredSession);
 
-  async function login(credentials: LoginRequest) {
-    const authSession = await loginRequest(credentials);
-
+  function storeSession(authSession: AuthSession) {
     localStorage.setItem('accessToken', authSession.accessToken);
     localStorage.setItem('refreshToken', authSession.refreshToken);
     localStorage.setItem('user', JSON.stringify(authSession.user));
     setSession(authSession);
+  }
 
+  async function login(credentials: LoginRequest) {
+    const authSession = await loginRequest(credentials);
+    storeSession(authSession);
+    return authSession;
+  }
+
+  async function signup(details: SignupRequest) {
+    const authSession = await signupRequest(details);
+    storeSession(authSession);
     return authSession;
   }
 
@@ -59,6 +71,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         user: session?.user ?? null,
         isAuthenticated: Boolean(session),
         login,
+        signup,
         logout,
       }}
     >

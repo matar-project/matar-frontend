@@ -3,6 +3,15 @@ export interface LoginRequest {
   password: string;
 }
 
+export type SignupRole = 'volunteer' | 'visually_impired';
+
+export interface SignupRequest {
+  name: string;
+  email: string;
+  password: string;
+  role: SignupRole;
+}
+
 export interface AuthUser {
   id: number;
   name: string;
@@ -21,7 +30,9 @@ export interface AuthContextValue {
   user: AuthUser | null;
   isAuthenticated: boolean;
   login: (credentials: LoginRequest) => Promise<AuthSession>;
+  signup: (details: SignupRequest) => Promise<AuthSession>;
   logout: () => void;
 }
 
 export type LoginFieldErrors = Partial<Record<keyof LoginRequest, string>>;
+export type SignupFieldErrors = Partial<Record<keyof SignupRequest, string>>;
