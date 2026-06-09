@@ -37,17 +37,24 @@ function getStoredSession(): AuthSession | null {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<AuthSession | null>(getStoredSession);
 
-  async function login(credentials: LoginRequest) {
-    logger.info('Login attempt', { email: credentials.email });
-    const authSession = await loginRequest(credentials);
-
+  function persistSession(authSession: AuthSession) {
     localStorage.setItem('accessToken', authSession.accessToken);
     localStorage.setItem('refreshToken', authSession.refreshToken);
     localStorage.setItem('user', JSON.stringify(authSession.user));
     setSession(authSession);
-    logger.info('Login successful', { email: authSession.user.email, role: authSession.user.role });
+  }
 
+  async function login(credentials: LoginRequest) {
+    logger.info('Login attempt', { email: credentials.email });
+    const authSession = await loginRequest(credentials);
+    persistSession(authSession);
+    logger.info('Login successful', { email: authSession.user.email, role: authSession.user.role });
     return authSession;
+  }
+
+  function loginWithSession(authSession: AuthSession) {
+    persistSession(authSession);
+    logger.info('Session set directly', { email: authSession.user.email, role: authSession.user.role });
   }
 
   function logout() {
@@ -65,6 +72,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         user: session?.user ?? null,
         isAuthenticated: Boolean(session),
         login,
+        loginWithSession,
         logout,
       }}
     >

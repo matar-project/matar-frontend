@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLoginSubmitForm } from '../Hooks/auth/UseLoginSubmitForm';
 import { useAuth } from '../Hooks/auth/UseAuth';
+import { getRoleRedirectPath } from '../lib/roleRedirect';
 import logo from '../assets/logo.png';
 
 function Login() {
@@ -11,7 +12,7 @@ function Login() {
 
   useEffect(() => {
     if (user) {
-      navigate(user.role === 'admin' ? '/admin' : '/', { replace: true });
+      navigate(getRoleRedirectPath(user.role), { replace: true });
     }
   }, [navigate, user]);
 
@@ -85,6 +86,13 @@ function Login() {
               {isSubmitting ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
             </button>
           </form>
+
+          <p className="text-center text-sm text-gray-500">
+            ليس لديك حساب؟{' '}
+            <Link to="/signup" className="text-primary-600 hover:underline font-medium">
+              إنشاء حساب
+            </Link>
+          </p>
         </div>
       </div>
     </main>

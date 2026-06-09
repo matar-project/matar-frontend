@@ -1,8 +1,12 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { GuestRoute } from './Components/GuestRoute';
 import { AdminRoute } from './Components/AdminRoute';
+import { VolunteerRoute } from './Components/VolunteerRoute';
+import { VisuallyImpairedRoute } from './Components/VisuallyImpairedRoute';
 import { PublicLayout } from './Components/layout/PublicLayout';
 import { AdminLayout } from './Components/layout/AdminLayout';
+import { VolunteerLayout } from './Components/layout/VolunteerLayout';
+import { VisuallyImpairedLayout } from './Components/layout/VisuallyImpairedLayout';
 
 // Public pages
 import Home from './Pages/public/Home';
@@ -21,8 +25,17 @@ import AdminVolunteers from './Pages/admin/AdminVolunteers';
 import AdminLibrary from './Pages/admin/AdminLibrary';
 import AdminSettings from './Pages/admin/AdminSettings';
 
+// Volunteer pages
+import VolunteerDashboard from './Pages/volunteer/VolunteerDashboard';
+import VolunteerOpportunities from './Pages/volunteer/VolunteerOpportunities';
+
+// Visually impaired pages
+import VIDashboard from './Pages/visually-impaired/VIDashboard';
+import VILibrary from './Pages/visually-impaired/VILibrary';
+
 // Auth
 import Login from './Pages/login';
+import Signup from './Pages/signup';
 
 function App() {
   return (
@@ -30,6 +43,7 @@ function App() {
       {/* Auth */}
       <Route element={<GuestRoute />}>
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Route>
 
       {/* Public website */}
@@ -52,6 +66,22 @@ function App() {
           <Route path="/admin/volunteers" element={<AdminVolunteers />} />
           <Route path="/admin/library" element={<AdminLibrary />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
+        </Route>
+      </Route>
+
+      {/* Volunteer dashboard */}
+      <Route element={<VolunteerRoute />}>
+        <Route element={<VolunteerLayout />}>
+          <Route path="/volunteer-dashboard" element={<VolunteerDashboard />} />
+          <Route path="/volunteer-dashboard/opportunities" element={<VolunteerOpportunities />} />
+        </Route>
+      </Route>
+
+      {/* Visually impaired dashboard */}
+      <Route element={<VisuallyImpairedRoute />}>
+        <Route element={<VisuallyImpairedLayout />}>
+          <Route path="/vi" element={<VIDashboard />} />
+          <Route path="/vi/library" element={<VILibrary />} />
         </Route>
       </Route>
 

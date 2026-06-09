@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Menu, X, LogIn, LogOut } from 'lucide-react';
+import { useAuth } from '../../Hooks/auth/UseAuth';
+import { getRoleRedirectPath } from '../../lib/roleRedirect';
 import logo from '../../assets/logo.png';
 
 const navLinks = [
@@ -14,6 +16,16 @@ const navLinks = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    setOpen(false);
+    logout();
+    navigate('/');
+  };
+
+  const dashboardPath = user ? getRoleRedirectPath(user.role) : '/login';
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50" role="banner">
@@ -48,7 +60,7 @@ export function Navbar() {
           ))}
         </ul>
 
-        {/* CTA buttons */}
+        {/* CTA buttons — desktop */}
         <div className="hidden md:flex items-center gap-2">
           <Link
             to="/request-help"
@@ -56,6 +68,34 @@ export function Navbar() {
           >
             اطلب مساعدة
           </Link>
+
+          {isAuthenticated ? (
+            <>
+              <Link
+                to={dashboardPath}
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 transition-colors"
+              >
+                {user?.name}
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition-colors"
+                aria-label="تسجيل الخروج"
+              >
+                <LogOut size={16} aria-hidden="true" />
+                خروج
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 transition-colors"
+            >
+              <LogIn size={16} aria-hidden="true" />
+              تسجيل الدخول
+            </Link>
+          )}
         </div>
 
         {/* Mobile menu button */}
@@ -101,6 +141,36 @@ export function Navbar() {
               >
                 اطلب مساعدة
               </Link>
+            </li>
+            <li>
+              {isAuthenticated ? (
+                <div className="space-y-1 pt-1 border-t border-gray-100 mt-2">
+                  <Link
+                    to={dashboardPath}
+                    onClick={() => setOpen(false)}
+                    className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                  >
+                    لوحة التحكم ({user?.name})
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-base font-medium text-red-600 hover:bg-red-50 rounded-md"
+                  >
+                    <LogOut size={16} aria-hidden="true" />
+                    تسجيل الخروج
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 mt-1 text-base font-medium text-gray-700 border border-gray-300 rounded-lg"
+                >
+                  <LogIn size={16} aria-hidden="true" />
+                  تسجيل الدخول
+                </Link>
+              )}
             </li>
           </ul>
         </div>

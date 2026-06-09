@@ -1,8 +1,13 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../Hooks/auth/UseAuth";
+import { getRoleRedirectPath } from "../lib/roleRedirect";
 
 export function GuestRoute() {
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
-  return isAuthenticated ? <Navigate to="/" replace /> : <Outlet />;
+  if (isAuthenticated && user) {
+    return <Navigate to={getRoleRedirectPath(user.role)} replace />;
+  }
+
+  return <Outlet />;
 }
