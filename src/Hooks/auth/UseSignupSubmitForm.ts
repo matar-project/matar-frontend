@@ -36,6 +36,14 @@ export function useSignupSubmitForm() {
     setServerError('');
   }
 
+  function validateField(field: keyof SignupRequest) {
+    const result = signupSchema.safeParse(values);
+    const message = result.success
+      ? undefined
+      : result.error.flatten().fieldErrors[field]?.[0];
+    setErrors((current) => ({ ...current, [field]: message }));
+  }
+
   async function submitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setServerError('');
@@ -74,5 +82,5 @@ export function useSignupSubmitForm() {
     }
   }
 
-  return { errors, isSubmitting, serverError, submitForm, updateField, values };
+  return { errors, isSubmitting, serverError, submitForm, updateField, validateField, values };
 }

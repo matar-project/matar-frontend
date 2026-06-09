@@ -24,7 +24,7 @@ const COUNTRY_OPTIONS = getCountries()
 function Signup() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { errors, isSubmitting, serverError, submitForm, updateField, values } = useSignupSubmitForm();
+  const { errors, isSubmitting, serverError, submitForm, updateField, validateField, values } = useSignupSubmitForm();
   const selectedCountry = values.country ? values.country as Country : undefined;
 
   useEffect(() => {
@@ -90,6 +90,7 @@ function Signup() {
                 type="email"
                 value={values.email}
                 onChange={(e) => updateField('email', e.target.value)}
+                onBlur={() => validateField('email')}
                 placeholder="you@example.com"
                 autoComplete="email"
                 aria-invalid={Boolean(errors.email)}
@@ -138,6 +139,7 @@ function Signup() {
                 type="text"
                 value={values.city}
                 onChange={(e) => updateField('city', e.target.value)}
+                maxLength={30}
                 placeholder={selectedCountry ? 'عمّان' : 'اختر الدولة أولاً'}
                 disabled={!selectedCountry}
                 autoComplete="address-level2"
@@ -169,6 +171,7 @@ function Signup() {
                   }}
                   className="PhoneInputInput"
                   autoComplete="tel"
+                  maxLength={16}
                   disabled={!selectedCountry}
                   placeholder={selectedCountry ? 'رقم الهاتف' : 'اختر الدولة أولاً'}
                   aria-invalid={Boolean(errors.phone)}
