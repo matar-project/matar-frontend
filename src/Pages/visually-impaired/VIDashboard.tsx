@@ -26,7 +26,7 @@ export default function VIDashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Link
-          to="/book-request"
+          to="/vi/book-request"
           className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4 hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
         >
           <div className="p-3 rounded-xl bg-teal-500">
@@ -39,7 +39,7 @@ export default function VIDashboard() {
         </Link>
 
         <Link
-          to="/request-help"
+          to="/vi/requests"
           className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4 hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
         >
           <div className="p-3 rounded-xl bg-primary-500">

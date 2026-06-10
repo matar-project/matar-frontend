@@ -27,10 +27,6 @@ export function Footer() {
             <ul className="space-y-2 text-sm" role="list">
               {[
                 { to: '/about', label: 'عن مطر' },
-                { to: '/library', label: 'المكتبة' },
-                { to: '/request-help', label: 'اطلب مساعدة' },
-                { to: '/volunteer', label: 'تطوع معنا' },
-                { to: '/opportunities', label: 'فرص التطوع' },
               ].map((l) => (
                 <li key={l.to}>
                   <Link

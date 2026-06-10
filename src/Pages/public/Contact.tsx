@@ -79,21 +79,9 @@ export default function Contact() {
         <section aria-label="روابط سريعة" className="space-y-6">
           <h2 className="text-xl font-semibold text-gray-900">هل تبحث عن؟</h2>
           <div className="space-y-3">
-            {[
-              { to: '/request-help', label: 'طلب مساعدة', desc: 'اطلب كتاباً أو دعماً تعليمياً' },
-              { to: '/book-request', label: 'طلب كتاب بعينه', desc: 'أطلب تحويل كتاب محدد' },
-              { to: '/volunteer', label: 'التطوع', desc: 'انضم كمتطوع في مطر' },
-              { to: '/library', label: 'المكتبة', desc: 'تصفح المواد المتاحة' },
-            ].map((item) => (
-              <a
-                key={item.to}
-                href={item.to}
-                className="block p-4 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-              >
-                <div className="font-medium text-gray-900">{item.label}</div>
-                <div className="text-sm text-gray-500">{item.desc}</div>
-              </a>
-            ))}
+            <p className="p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-600">
+              سجّل الدخول للوصول إلى الخدمات والمكتبة من لوحة التحكم الخاصة بحسابك.
+            </p>
           </div>
         </section>
       </div>

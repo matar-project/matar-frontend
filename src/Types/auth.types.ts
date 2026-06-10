@@ -6,6 +6,9 @@ export interface LoginRequest {
 export interface SignupRequest {
   name: string;
   email: string;
+  phone: string;
+  country: string;
+  city: string;
   password: string;
   role: 'volunteer' | 'visually_impired';
 }
@@ -14,13 +17,15 @@ export interface AuthUser {
   id: number;
   name: string;
   email: string;
+  phone: string | null;
+  country: string | null;
+  city: string | null;
   role: string;
 }
 
 export interface AuthSession {
   user: AuthUser;
   accessToken: string;
-  refreshToken: string;
 }
 
 export interface AuthContextValue {
@@ -29,7 +34,7 @@ export interface AuthContextValue {
   isAuthenticated: boolean;
   login: (credentials: LoginRequest) => Promise<AuthSession>;
   loginWithSession: (session: AuthSession) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 export type LoginFieldErrors = Partial<Record<keyof LoginRequest, string>>;

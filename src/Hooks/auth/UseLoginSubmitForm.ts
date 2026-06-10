@@ -59,7 +59,7 @@ export function useLoginSubmitForm() {
     setIsSubmitting(true);
 
     try {
-      await login(result.data);
+      return await login(result.data);
     } catch (error) {
       const msg = getServerError(error);
       logger.error('Login failed', msg);

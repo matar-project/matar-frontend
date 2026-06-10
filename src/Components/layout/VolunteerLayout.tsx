@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../Hooks/auth/UseAuth';
-import { Menu, X, LayoutDashboard, BookOpen, LogOut } from 'lucide-react';
+import { Menu, X, LayoutDashboard, BookOpen, ClipboardList, Library, LogOut } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
 const navItems = [
   { to: '/volunteer-dashboard', label: 'الرئيسية', icon: LayoutDashboard, end: true },
+  { to: '/volunteer-dashboard/library', label: 'المكتبة الصوتية', icon: Library },
   { to: '/volunteer-dashboard/opportunities', label: 'الفرص المتاحة', icon: BookOpen },
+  { to: '/volunteer-dashboard/application', label: 'نموذج التطوع', icon: ClipboardList },
 ];
 
 export function VolunteerLayout() {
@@ -14,7 +16,7 @@ export function VolunteerLayout() {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => { logout(); navigate('/login'); };
+  const handleLogout = async () => { await logout(); navigate('/login'); };
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">

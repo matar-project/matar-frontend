@@ -1,20 +1,45 @@
-import { useEffect } from 'react';
+import { useEffect, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSignupSubmitForm } from '../Hooks/auth/UseSignupSubmitForm';
 import { useAuth } from '../Hooks/auth/UseAuth';
 import { getRoleRedirectPath } from '../lib/roleRedirect';
 import logo from '../assets/logo.png';
+import Select from 'react-select';
+import {
+  getCountryCallingCode,
+  getCountries,
+  type Country,
+} from 'react-phone-number-input';
+import PhoneNumberInput from 'react-phone-number-input/input';
+import ar from 'react-phone-number-input/locale/ar';
+import { cn } from '../lib/utils';
+
+const COUNTRY_OPTIONS = getCountries()
+  .map((code) => ({
+    value: code,
+    label: `${ar[code] ?? code} (+${getCountryCallingCode(code)})`,
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label, 'ar'));
 
 function Signup() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { errors, isSubmitting, serverError, submitForm, updateField, values } = useSignupSubmitForm();
+  const { errors, isSubmitting, serverError, submitForm, updateField, validateField, values } = useSignupSubmitForm();
+  const selectedCountry = values.country ? values.country as Country : undefined;
 
   useEffect(() => {
     if (user) {
       navigate(getRoleRedirectPath(user.role), { replace: true });
     }
   }, [navigate, user]);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    const session = await submitForm(event);
+
+    if (session) {
+      navigate(getRoleRedirectPath(session.user.role), { replace: true });
+    }
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10" dir="rtl">
@@ -33,7 +58,7 @@ function Signup() {
             </div>
           )}
 
-          <form onSubmit={submitForm} className="space-y-5" noValidate aria-label="نموذج إنشاء حساب">
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate aria-label="نموذج إنشاء حساب">
             {/* Name */}
             <div className="space-y-1">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -65,6 +90,7 @@ function Signup() {
                 type="email"
                 value={values.email}
                 onChange={(e) => updateField('email', e.target.value)}
+                onBlur={() => validateField('email')}
                 placeholder="you@example.com"
                 autoComplete="email"
                 aria-invalid={Boolean(errors.email)}
@@ -73,6 +99,87 @@ function Signup() {
               />
               {errors.email && (
                 <p id="email-error" className="text-sm text-red-600" role="alert">{errors.email}</p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div className="space-y-1">
+              <label htmlFor="country" className="block text-sm font-medium text-gray-700">
+                الدولة
+              </label>
+              <Select
+                inputId="country"
+                isRtl
+                isSearchable
+                options={COUNTRY_OPTIONS}
+                value={COUNTRY_OPTIONS.find((option) => option.value === values.country) ?? null}
+                onChange={(option) => {
+                  updateField('country', option?.value ?? '');
+                  updateField('city', '');
+                  updateField('phone', '');
+                }}
+                placeholder="ابحث عن الدولة..."
+                noOptionsMessage={() => 'لا توجد دولة مطابقة'}
+                classNamePrefix="searchable-country"
+                className={errors.country ? 'searchable-country-error' : undefined}
+                aria-invalid={Boolean(errors.country)}
+                aria-describedby={errors.country ? 'country-error' : undefined}
+              />
+              {errors.country && (
+                <p id="country-error" className="text-sm text-red-600" role="alert">{errors.country}</p>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                المدينة
+              </label>
+              <input
+                id="city"
+                type="text"
+                value={values.city}
+                onChange={(e) => updateField('city', e.target.value)}
+                maxLength={30}
+                placeholder={selectedCountry ? 'عمّان' : 'اختر الدولة أولاً'}
+                disabled={!selectedCountry}
+                autoComplete="address-level2"
+                aria-invalid={Boolean(errors.city)}
+                aria-describedby={errors.city ? 'city-error' : undefined}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+              />
+              {errors.city && (
+                <p id="city-error" className="text-sm text-red-600" role="alert">{errors.city}</p>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                رقم الهاتف
+              </label>
+              <div className={cn('international-phone-input', errors.phone && 'international-phone-input-error')}>
+                <span className="phone-country-code" dir="ltr">
+                  {selectedCountry ? `+${getCountryCallingCode(selectedCountry)}` : '--'}
+                </span>
+                <PhoneNumberInput
+                  id="phone"
+                  country={selectedCountry}
+                  value={values.phone || undefined}
+                  onChange={(value) => {
+                    if (!value || value.replace(/\D/g, '').length <= 15) {
+                      updateField('phone', value ?? '');
+                    }
+                  }}
+                  className="PhoneInputInput"
+                  autoComplete="tel"
+                  maxLength={16}
+                  disabled={!selectedCountry}
+                  placeholder={selectedCountry ? 'رقم الهاتف' : 'اختر الدولة أولاً'}
+                  aria-invalid={Boolean(errors.phone)}
+                  aria-describedby={errors.phone ? 'phone-error' : undefined}
+                />
+              </div>
+              {errors.phone && (
+                <p id="phone-error" className="text-sm text-red-600" role="alert">{errors.phone}</p>
               )}
             </div>
 

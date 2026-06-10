@@ -1,13 +1,12 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   login as loginRequest,
-  signup as signupRequest,
+  logout as logoutRequest,
 } from '../api/auth.api';
 import type {
   AuthSession,
   AuthUser,
   LoginRequest,
-  SignupRequest,
 } from '../Types/auth.types';
 import { AuthContext } from './AuthContext';
 import { logger } from '../lib/logger';
@@ -17,22 +16,21 @@ interface AuthProviderProps {
 }
 
 function getStoredSession(): AuthSession | null {
+  localStorage.removeItem('refreshToken');
   const accessToken = localStorage.getItem('accessToken');
-  const refreshToken = localStorage.getItem('refreshToken');
   const storedUser = localStorage.getItem('user');
 
-  if (!accessToken || !refreshToken || !storedUser) {
+  if (!accessToken || !storedUser) {
     return null;
   }
 
   try {
     const user = JSON.parse(storedUser) as AuthUser;
     logger.info('Session restored from localStorage', { email: user.email, role: user.role });
-    return { accessToken, refreshToken, user };
+    return { accessToken, user };
   } catch {
     logger.warn('Corrupt session data in localStorage — clearing');
     localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     return null;
   }
@@ -41,9 +39,23 @@ function getStoredSession(): AuthSession | null {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<AuthSession | null>(getStoredSession);
 
+  useEffect(() => {
+    const handleRefresh = (event: Event) => {
+      setSession((event as CustomEvent<AuthSession>).detail);
+    };
+    const handleExpired = () => setSession(null);
+
+    window.addEventListener('auth-session-refreshed', handleRefresh);
+    window.addEventListener('auth-session-expired', handleExpired);
+    return () => {
+      window.removeEventListener('auth-session-refreshed', handleRefresh);
+      window.removeEventListener('auth-session-expired', handleExpired);
+    };
+  }, []);
+
   function persistSession(authSession: AuthSession) {
     localStorage.setItem('accessToken', authSession.accessToken);
-    localStorage.setItem('refreshToken', authSession.refreshToken);
+    localStorage.removeItem('refreshToken');
     localStorage.setItem('user', JSON.stringify(authSession.user));
     setSession(authSession);
   }
@@ -61,12 +73,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     logger.info('Session set directly', { email: authSession.user.email, role: authSession.user.role });
   }
 
-  function logout() {
+  async function logout() {
     logger.info('User logged out', { email: session?.user.email });
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('user');
-    setSession(null);
+    try {
+      await logoutRequest();
+    } finally {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      setSession(null);
+    }
   }
 
   return (

@@ -17,7 +17,7 @@ export function AdminLayout() {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => { logout(); navigate('/login'); };
+  const handleLogout = async () => { await logout(); navigate('/login'); };
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">

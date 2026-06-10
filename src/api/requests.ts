@@ -1,23 +1,14 @@
 import { apiClient } from './client';
 
 export interface CreateRequestDto {
-  fullName: string;
-  phone: string;
-  email?: string;
-  city: string;
   requestType: string;
   details: string;
 }
 
 export interface CreateBookRequestDto {
-  fullName: string;
-  phone: string;
-  email?: string;
-  city: string;
   bookTitle: string;
   author?: string;
   subject: string;
-  country?: string;
   curriculum?: string;
   academicYear?: string;
   notes?: string;
