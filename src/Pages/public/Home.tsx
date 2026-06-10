@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { BookOpen, Users, CheckCircle, Library } from 'lucide-react';
+import { BookOpen, Users, CheckCircle, Library, type LucideIcon } from 'lucide-react';
 import { requestsApi } from '../../api/requests';
-import { Button } from '../../Components/ui/Button';
 import { useAuth } from '../../Hooks/auth/UseAuth';
 
-function StatCard({ icon: Icon, value, label }: { icon: any; value: number | string; label: string }) {
+function StatCard({ icon: Icon, value, label }: { icon: LucideIcon; value: number | string; label: string }) {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 text-center">
       <Icon className="mx-auto mb-3 text-primary-600" size={32} aria-hidden="true" />
@@ -61,7 +60,7 @@ export default function Home() {
             )}
             {canVolunteer && (
               <Link
-                to="/volunteer-dashboard/application"
+                to="/volunteer-dashboard/opportunities"
                 className="px-7 py-4 text-lg font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white border-2 border-white text-white hover:bg-primary-700 inline-flex items-center justify-center"
                 aria-label="انضم كمتطوع في مشروع مطر"
               >
@@ -153,7 +152,7 @@ export default function Home() {
             )}
             {canVolunteer && (
               <Link
-                to="/volunteer-dashboard/application"
+                to="/volunteer-dashboard/opportunities"
                 className="px-8 py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-secondary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors text-center"
               >
                 تطوع معنا

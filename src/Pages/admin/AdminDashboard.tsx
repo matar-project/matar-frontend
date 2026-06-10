@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { requestsApi } from '../../api/requests';
 import { volunteersApi } from '../../api/volunteers';
-import { libraryApi } from '../../api/library';
 import { Users, BookOpen, Library, CheckCircle } from 'lucide-react';
 
 function StatCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: number; color: string }) {
@@ -20,9 +19,8 @@ function StatCard({ icon: Icon, label, value, color }: { icon: any; label: strin
 
 export default function AdminDashboard() {
   const { data: stats } = useQuery({ queryKey: ['stats'], queryFn: requestsApi.getStats });
-  const { data: volunteers } = useQuery({ queryKey: ['admin-volunteers'], queryFn: () => volunteersApi.getAll(1, 5) });
-  const { data: library } = useQuery({ queryKey: ['admin-library'], queryFn: () => libraryApi.findAllAdmin ? libraryApi.findAllAdmin(1, 5) : libraryApi.getAllAdmin(1, 5) });
-  const { data: requests } = useQuery({ queryKey: ['admin-requests'], queryFn: () => requestsApi.getRequests(1, 5) });
+  const { data: volunteers } = useQuery({ queryKey: ['admin-volunteers'], queryFn: () => volunteersApi.getAll({ page: 1, limit: 5 }) });
+  const { data: requests } = useQuery({ queryKey: ['admin-requests'], queryFn: () => requestsApi.getRequests({ page: 1, limit: 5 }) });
 
   return (
     <div className="space-y-6">
@@ -72,10 +70,8 @@ export default function AdminDashboard() {
                   <p className="text-sm font-medium text-gray-800">{v.name}</p>
                   <p className="text-xs text-gray-500">{v.city} · {v.phone}</p>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                  v.contacted ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                }`}>
-                  {v.contacted ? 'تم التواصل' : 'جديد'}
+                <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
+                  متطوع
                 </span>
               </li>
             ))}

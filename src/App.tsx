@@ -3,10 +3,12 @@ import { GuestRoute } from "./Components/GuestRoute";
 import { AdminRoute } from "./Components/AdminRoute";
 import { VolunteerRoute } from "./Components/VolunteerRoute";
 import { VisuallyImpairedRoute } from "./Components/VisuallyImpairedRoute";
+import { CoordinatorRoute } from "./Components/CoordinatorRoute";
 import { PublicLayout } from "./Components/layout/PublicLayout";
 import { AdminLayout } from "./Components/layout/AdminLayout";
 import { VolunteerLayout } from "./Components/layout/VolunteerLayout";
 import { VisuallyImpairedLayout } from "./Components/layout/VisuallyImpairedLayout";
+import { CoordinatorLayout } from "./Components/layout/CoordinatorLayout";
 
 // Public pages
 import Home from "./Pages/public/Home";
@@ -23,13 +25,15 @@ import AdminSettings from "./Pages/admin/AdminSettings";
 // Volunteer pages
 import VolunteerDashboard from "./Pages/volunteer/VolunteerDashboard";
 import VolunteerOpportunities from "./Pages/volunteer/VolunteerOpportunities";
-import VolunteerApplication from "./Pages/volunteer/VolunteerApplication";
+import VolunteerWorkRequests from "./Pages/volunteer/VolunteerWorkRequests";
 
 // Visually impaired pages
 import VIDashboard from "./Pages/visually-impaired/VIDashboard";
 import VILibrary from "./Pages/visually-impaired/VILibrary";
 import VIRequestHelp from "./Pages/visually-impaired/VIRequestHelp";
-import BookRequest from "./Pages/visually-impaired/BookRequest";
+import CoordinatorDashboard from "./Pages/coordinator/CoordinatorDashboard";
+import CoordinatorRequests from "./Pages/coordinator/CoordinatorRequests";
+import CoordinatorReservations from "./Pages/coordinator/CoordinatorReservations";
 
 // Auth
 import Login from "./Pages/login";
@@ -74,8 +78,20 @@ function App() {
             element={<VolunteerOpportunities />}
           />
           <Route
-            path="/volunteer-dashboard/application"
-            element={<VolunteerApplication />}
+            path="/volunteer-dashboard/work-requests"
+            element={<VolunteerWorkRequests />}
+          />
+        </Route>
+      </Route>
+
+      {/* Coordinator dashboard */}
+      <Route element={<CoordinatorRoute />}>
+        <Route element={<CoordinatorLayout />}>
+          <Route path="/coordinator" element={<CoordinatorDashboard />} />
+          <Route path="/coordinator/requests" element={<CoordinatorRequests />} />
+          <Route
+            path="/coordinator/reservations"
+            element={<CoordinatorReservations />}
           />
         </Route>
       </Route>
@@ -86,7 +102,6 @@ function App() {
           <Route path="/vi" element={<VIDashboard />} />
           <Route path="/vi/library" element={<VILibrary />} />
           <Route path="/vi/requests" element={<VIRequestHelp />} />
-          <Route path="/vi/book-request" element={<BookRequest />} />
         </Route>
       </Route>
 

@@ -8,7 +8,7 @@ const navItems = [
   { to: '/volunteer-dashboard', label: 'الرئيسية', icon: LayoutDashboard, end: true },
   { to: '/volunteer-dashboard/library', label: 'المكتبة الصوتية', icon: Library },
   { to: '/volunteer-dashboard/opportunities', label: 'الفرص المتاحة', icon: BookOpen },
-  { to: '/volunteer-dashboard/application', label: 'نموذج التطوع', icon: ClipboardList },
+  { to: '/volunteer-dashboard/work-requests', label: 'حجوزاتي', icon: ClipboardList },
 ];
 
 export function VolunteerLayout() {

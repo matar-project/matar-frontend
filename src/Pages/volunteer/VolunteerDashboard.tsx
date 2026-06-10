@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../Hooks/auth/UseAuth';
 import { opportunitiesApi, type Opportunity } from '../../api/opportunities';
 import { BookOpen, Clock, CheckCircle, Library } from 'lucide-react';
+import { CoordinatorContactCard } from '../../Components/CoordinatorContactCard';
 
 function OpportunityCard({ opp }: { opp: Opportunity }) {
   const statusLabel =
@@ -39,11 +40,12 @@ export default function VolunteerDashboard() {
   const { user } = useAuth();
   const { data: opportunities, isLoading } = useQuery({
     queryKey: ['opportunities'],
-    queryFn: opportunitiesApi.getAll,
+    queryFn: () => opportunitiesApi.getAll({ page: 1, limit: 10 }),
   });
 
-  const available = opportunities?.filter((o) => o.status === 'AVAILABLE') ?? [];
-  const inProgress = opportunities?.filter((o) => o.status === 'IN_PROGRESS') ?? [];
+  const opportunityRows = opportunities?.data ?? [];
+  const available = opportunityRows.filter((o) => o.status === 'AVAILABLE');
+  const inProgress = opportunityRows.filter((o) => o.status === 'IN_PROGRESS');
 
   return (
     <div className="space-y-6">
@@ -55,6 +57,8 @@ export default function VolunteerDashboard() {
           شكراً لتطوعك مع مشروع مطر. إليك الفرص المتاحة حالياً.
         </p>
       </div>
+
+      <CoordinatorContactCard />
 
       <Link
         to="/volunteer-dashboard/library"
@@ -94,7 +98,7 @@ export default function VolunteerDashboard() {
           </div>
           <div>
             <p className="text-sm text-gray-500">إجمالي الفرص</p>
-            <p className="text-2xl font-bold text-gray-900">{opportunities?.length ?? 0}</p>
+            <p className="text-2xl font-bold text-gray-900">{opportunities?.total ?? 0}</p>
           </div>
         </div>
       </div>

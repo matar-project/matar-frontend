@@ -1,5 +1,9 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -7,6 +11,8 @@ import { libraryApi } from '../../api/library';
 import { InputField, TextareaField, SelectField } from '../../Components/ui/FormField';
 import { Button } from '../../Components/ui/Button';
 import { Trash2, Edit2, Plus, X } from 'lucide-react';
+import { InfiniteScrollTrigger } from '../../Components/InfiniteScrollTrigger';
+import { useDebouncedValue } from '../../Hooks/useDebouncedValue';
 
 const ITEM_TYPES = [
   { value: 'AUDIO', label: 'صوتي' },
@@ -94,15 +100,26 @@ function LibraryForm({ item, onClose }: { item?: any; onClose: () => void }) {
 }
 
 export default function AdminLibrary() {
-  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search, 500);
   const [formOpen, setFormOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const qc = useQueryClient();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['admin-library-list', page],
-    queryFn: () => libraryApi.getAllAdmin(page, 20),
+  const libraryQuery = useInfiniteQuery({
+    queryKey: ['admin-library-list', debouncedSearch],
+    queryFn: ({ pageParam }) =>
+      libraryApi.getAllAdmin({
+        page: pageParam,
+        limit: 10,
+        search: debouncedSearch || undefined,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasMore ? lastPage.page + 1 : undefined,
   });
+  const items = libraryQuery.data?.pages.flatMap((page) => page.data) ?? [];
+  const total = libraryQuery.data?.pages[0]?.total ?? 0;
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => libraryApi.remove(id),
@@ -118,18 +135,26 @@ export default function AdminLibrary() {
         </Button>
       </div>
 
-      {isLoading && (
+      <input
+        type="search"
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        placeholder="ابحث في جميع الحقول..."
+        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+      />
+
+      {libraryQuery.isLoading && (
         <div className="flex justify-center py-12" aria-busy="true">
           <div className="h-8 w-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" aria-hidden="true" />
           <span className="sr-only">جاري التحميل...</span>
         </div>
       )}
 
-      {data && (
+      {libraryQuery.data && (
         <>
-          <p className="text-sm text-gray-500">{data.total} عنصر</p>
+          <p className="text-sm text-gray-500">{total} عنصر</p>
           <ul className="space-y-3" role="list">
-            {data.data.map((item: any) => (
+            {items.map((item: any) => (
               <li key={item.id} className="bg-white rounded-xl shadow-sm p-4 flex items-center justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-gray-900 truncate">{item.title}</p>
@@ -160,13 +185,11 @@ export default function AdminLibrary() {
             ))}
           </ul>
 
-          {data.total > 20 && (
-            <nav className="flex justify-center gap-2" aria-label="التنقل بين الصفحات">
-              <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>السابق</Button>
-              <span className="flex items-center px-3 text-sm">صفحة {page}</span>
-              <Button variant="outline" size="sm" disabled={page >= Math.ceil(data.total / 20)} onClick={() => setPage((p) => p + 1)}>التالي</Button>
-            </nav>
-          )}
+          <InfiniteScrollTrigger
+            hasNextPage={Boolean(libraryQuery.hasNextPage)}
+            isFetchingNextPage={libraryQuery.isFetchingNextPage}
+            fetchNextPage={() => void libraryQuery.fetchNextPage()}
+          />
         </>
       )}
 
