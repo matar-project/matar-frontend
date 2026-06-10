@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { settingsApi, opportunitiesApi } from '../../api/settings';
 import { InputField } from '../../Components/ui/FormField';
 import { Button } from '../../Components/ui/Button';
 import { Plus, Trash2, Edit2 } from 'lucide-react';
+import { InfiniteScrollTrigger } from '../../Components/InfiniteScrollTrigger';
+import { useDebouncedValue } from '../../Hooks/useDebouncedValue';
 
 function SettingsPanel() {
   const qc = useQueryClient();
@@ -59,7 +66,22 @@ function SettingsPanel() {
 
 function OpportunitiesPanel() {
   const qc = useQueryClient();
-  const { data } = useQuery({ queryKey: ['admin-opportunities'], queryFn: opportunitiesApi.getAll });
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search, 500);
+  const opportunitiesQuery = useInfiniteQuery({
+    queryKey: ['admin-opportunities', debouncedSearch],
+    queryFn: ({ pageParam }) =>
+      opportunitiesApi.getAll({
+        page: pageParam,
+        limit: 10,
+        search: debouncedSearch || undefined,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: any) =>
+      lastPage.hasMore ? lastPage.page + 1 : undefined,
+  });
+  const opportunities =
+    opportunitiesQuery.data?.pages.flatMap((page: any) => page.data) ?? [];
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [form, setForm] = useState({ title: '', description: '', subject: '', totalPages: '', remainingPages: '' });
@@ -119,8 +141,16 @@ function OpportunitiesPanel() {
         </div>
       )}
 
+      <input
+        type="search"
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        placeholder="ابحث في جميع الحقول..."
+        className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+      />
+
       <ul className="space-y-2" role="list">
-        {data?.map((opp: any) => (
+        {opportunities.map((opp: any) => (
           <li key={opp.id} className="flex items-center justify-between gap-3 p-3 border border-gray-200 rounded-lg">
             <div>
               <p className="text-sm font-medium text-gray-900">{opp.title}</p>
@@ -133,8 +163,13 @@ function OpportunitiesPanel() {
             </div>
           </li>
         ))}
-        {data?.length === 0 && <li className="text-sm text-gray-400 text-center py-4">لا توجد فرص بعد</li>}
+        {!opportunitiesQuery.isLoading && opportunities.length === 0 && <li className="text-sm text-gray-400 text-center py-4">لا توجد فرص بعد</li>}
       </ul>
+      <InfiniteScrollTrigger
+        hasNextPage={Boolean(opportunitiesQuery.hasNextPage)}
+        isFetchingNextPage={opportunitiesQuery.isFetchingNextPage}
+        fetchNextPage={() => void opportunitiesQuery.fetchNextPage()}
+      />
     </section>
   );
 }

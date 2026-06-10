@@ -60,7 +60,7 @@ export default function Home() {
             )}
             {canVolunteer && (
               <Link
-                to="/volunteer-dashboard/application"
+                to="/volunteer-dashboard/opportunities"
                 className="px-7 py-4 text-lg font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white border-2 border-white text-white hover:bg-primary-700 inline-flex items-center justify-center"
                 aria-label="انضم كمتطوع في مشروع مطر"
               >
@@ -152,7 +152,7 @@ export default function Home() {
             )}
             {canVolunteer && (
               <Link
-                to="/volunteer-dashboard/application"
+                to="/volunteer-dashboard/opportunities"
                 className="px-8 py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-secondary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors text-center"
               >
                 تطوع معنا

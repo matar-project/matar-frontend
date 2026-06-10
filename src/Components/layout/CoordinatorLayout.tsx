@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { ClipboardList, LayoutDashboard, LogOut, Menu, Timer, X } from 'lucide-react';
+import {
+  ClipboardList,
+  Clock3,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  X,
+} from 'lucide-react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import { useAuth } from '../../Hooks/auth/UseAuth';
@@ -7,7 +14,7 @@ import { useAuth } from '../../Hooks/auth/UseAuth';
 const navItems = [
   { to: '/coordinator', label: 'الرئيسية', icon: LayoutDashboard, end: true },
   { to: '/coordinator/requests', label: 'الطلبات', icon: ClipboardList },
-  { to: '/coordinator/reservations', label: 'حجوزات الصفحات', icon: Timer },
+  { to: '/coordinator/reservations', label: 'حجوزات الصفحات', icon: Clock3 },
 ];
 
 export function CoordinatorLayout() {

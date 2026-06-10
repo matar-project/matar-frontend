@@ -37,20 +37,13 @@ export default function CoordinatorDashboard() {
           </div>
         ))}
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="w-full">
         <Link
           to="/coordinator/requests"
-          className="rounded-xl bg-cyan-700 p-6 text-white shadow-sm hover:bg-cyan-800"
+          className="block w-full rounded-xl bg-cyan-700 p-6 text-white shadow-sm transition-colors hover:bg-cyan-800"
         >
           <h3 className="font-bold">مراجعة الطلبات</h3>
           <p className="mt-2 text-sm text-cyan-100">قبول أو رفض الطلبات الجديدة وإضافة الملاحظات.</p>
-        </Link>
-        <Link
-          to="/coordinator/reservations"
-          className="rounded-xl bg-white p-6 text-gray-900 shadow-sm hover:shadow-md"
-        >
-          <h3 className="font-bold">متابعة حجوزات الصفحات</h3>
-          <p className="mt-2 text-sm text-gray-500">عرض المواعيد النهائية والمهام المتأخرة.</p>
         </Link>
       </div>
     </div>

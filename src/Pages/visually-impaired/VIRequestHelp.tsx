@@ -11,13 +11,20 @@ import { useAuth } from '../../Hooks/auth/UseAuth';
 const schema = z
   .object({
     requestType: z.enum(['PDF_TO_WORD', 'PDF_TO_AUDIO', 'ACCOMPANIMENT']),
-    title: z.string().min(1, 'عنوان الطلب مطلوب').max(200),
+    bookName: z.string().optional(),
     details: z.string().min(10, 'يرجى كتابة 10 أحرف على الأقل'),
     pdfFile: z.custom<FileList>().optional(),
     totalPages: z.string().optional(),
   })
   .superRefine((value, context) => {
     if (value.requestType === 'ACCOMPANIMENT') return;
+    if (!value.bookName?.trim()) {
+      context.addIssue({
+        code: 'custom',
+        path: ['bookName'],
+        message: 'اسم الكتاب مطلوب',
+      });
+    }
     const totalPages = Number(value.totalPages);
     if (!Number.isInteger(totalPages) || totalPages < 1) {
       context.addIssue({
@@ -66,7 +73,7 @@ export default function VIRequestHelp() {
     resolver: zodResolver(schema),
     defaultValues: {
       requestType: 'PDF_TO_WORD',
-      title: '',
+      bookName: '',
       details: '',
       totalPages: '',
     },
@@ -84,7 +91,7 @@ export default function VIRequestHelp() {
     mutation.mutate({
       data: {
         requestType: values.requestType,
-        title: values.title.trim(),
+        ...(isPdfRequest ? { bookName: values.bookName?.trim() } : {}),
         details: values.details.trim(),
         ...(isPdfRequest ? { totalPages: Number(values.totalPages) } : {}),
       },
@@ -137,13 +144,15 @@ export default function VIRequestHelp() {
           <option value="PDF_TO_AUDIO">تحويل PDF إلى تسجيل صوتي</option>
           <option value="ACCOMPANIMENT">طلب مرافقة</option>
         </SelectField>
-        <InputField
-          id="title"
-          label="عنوان الطلب"
-          required
-          error={errors.title?.message}
-          {...register('title')}
-        />
+        {isPdfRequest && (
+          <InputField
+            id="bookName"
+            label="اسم الكتاب"
+            required
+            error={errors.bookName?.message}
+            {...register('bookName')}
+          />
+        )}
         <TextareaField
           id="details"
           label="تفاصيل الطلب"
@@ -152,7 +161,8 @@ export default function VIRequestHelp() {
           {...register('details')}
         />
         {isPdfRequest && (
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
             <InputField
               id="pdfFile"
               label="ملف PDF"
@@ -171,6 +181,7 @@ export default function VIRequestHelp() {
               error={errors.totalPages?.message}
               {...register('totalPages')}
             />
+            </div>
           </div>
         )}
         {mutation.isError && (

@@ -25,14 +25,12 @@ import AdminSettings from "./Pages/admin/AdminSettings";
 // Volunteer pages
 import VolunteerDashboard from "./Pages/volunteer/VolunteerDashboard";
 import VolunteerOpportunities from "./Pages/volunteer/VolunteerOpportunities";
-import VolunteerApplication from "./Pages/volunteer/VolunteerApplication";
 import VolunteerWorkRequests from "./Pages/volunteer/VolunteerWorkRequests";
 
 // Visually impaired pages
 import VIDashboard from "./Pages/visually-impaired/VIDashboard";
 import VILibrary from "./Pages/visually-impaired/VILibrary";
 import VIRequestHelp from "./Pages/visually-impaired/VIRequestHelp";
-import BookRequest from "./Pages/visually-impaired/BookRequest";
 import CoordinatorDashboard from "./Pages/coordinator/CoordinatorDashboard";
 import CoordinatorRequests from "./Pages/coordinator/CoordinatorRequests";
 import CoordinatorReservations from "./Pages/coordinator/CoordinatorReservations";
@@ -80,10 +78,6 @@ function App() {
             element={<VolunteerOpportunities />}
           />
           <Route
-            path="/volunteer-dashboard/application"
-            element={<VolunteerApplication />}
-          />
-          <Route
             path="/volunteer-dashboard/work-requests"
             element={<VolunteerWorkRequests />}
           />
@@ -95,7 +89,10 @@ function App() {
         <Route element={<CoordinatorLayout />}>
           <Route path="/coordinator" element={<CoordinatorDashboard />} />
           <Route path="/coordinator/requests" element={<CoordinatorRequests />} />
-          <Route path="/coordinator/reservations" element={<CoordinatorReservations />} />
+          <Route
+            path="/coordinator/reservations"
+            element={<CoordinatorReservations />}
+          />
         </Route>
       </Route>
 
@@ -105,7 +102,6 @@ function App() {
           <Route path="/vi" element={<VIDashboard />} />
           <Route path="/vi/library" element={<VILibrary />} />
           <Route path="/vi/requests" element={<VIRequestHelp />} />
-          <Route path="/vi/book-request" element={<BookRequest />} />
         </Route>
       </Route>
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../Hooks/auth/UseAuth';
 import { libraryApi } from '../../api/library';
 import { Library, FileText, BookOpen, Phone } from 'lucide-react';
+import { CoordinatorContactCard } from '../../Components/CoordinatorContactCard';
 
 export default function VIDashboard() {
   const { user } = useAuth();
@@ -24,20 +25,9 @@ export default function VIDashboard() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Link
-          to="/vi/book-request"
-          className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4 hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
-        >
-          <div className="p-3 rounded-xl bg-teal-500">
-            <BookOpen size={22} className="text-white" aria-hidden="true" />
-          </div>
-          <div>
-            <p className="font-semibold text-gray-900 text-sm">طلب كتاب مسموع</p>
-            <p className="text-xs text-gray-500 mt-0.5">اطلب تحويل كتاب إلى صيغة صوتية</p>
-          </div>
-        </Link>
+      <CoordinatorContactCard />
 
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Link
           to="/vi/requests"
           className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4 hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"

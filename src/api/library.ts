@@ -1,4 +1,5 @@
 import { apiClient } from './client';
+import type { PaginatedResponse } from './pagination';
 
 export interface LibraryFilters {
   search?: string;
@@ -27,14 +28,26 @@ export interface LibraryItem {
   updatedAt: string;
 }
 
-export interface LibraryResponse {
-  data: LibraryItem[];
-  total: number;
-  page: number;
-  limit: number;
+export type LibraryResponse = PaginatedResponse<LibraryItem>;
+
+export interface SystemBook {
+  id: number;
+  name: string;
+  wordCompleted: boolean;
+  audioCompleted: boolean;
+  wordCompletedAt: string | null;
+  audioCompletedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
+export type SystemBooksResponse = PaginatedResponse<SystemBook>;
+
 export const libraryApi = {
+  getSystemBooks: (filters: Pick<LibraryFilters, 'search' | 'page' | 'limit'> = {}) =>
+    apiClient
+      .get<SystemBooksResponse>('/library/books', { params: filters })
+      .then((r) => r.data),
   getAll: (filters: LibraryFilters = {}) =>
     apiClient.get<LibraryResponse>('/library', { params: filters }).then((r) => r.data),
 
@@ -42,9 +55,11 @@ export const libraryApi = {
     apiClient.get(`/library/${id}`).then((r) => r.data),
 
   // Admin
-  getAllAdmin: (page = 1, limit = 20) =>
+  getAllAdmin: (
+    params: Pick<LibraryFilters, 'search' | 'page' | 'limit'> = {},
+  ) =>
     apiClient
-      .get<LibraryResponse>('/library/admin/all', { params: { page, limit } })
+      .get<LibraryResponse>('/library/admin/all', { params })
       .then((r) => r.data),
 
   create: (dto: any) =>

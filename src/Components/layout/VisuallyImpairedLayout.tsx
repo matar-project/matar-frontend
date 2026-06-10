@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../Hooks/auth/UseAuth';
-import { Menu, X, LayoutDashboard, Library, FileText, BookOpen, LogOut } from 'lucide-react';
+import { Menu, X, LayoutDashboard, Library, FileText, LogOut } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
 const navItems = [
   { to: '/vi', label: 'الرئيسية', icon: LayoutDashboard, end: true },
   { to: '/vi/library', label: 'المكتبة الصوتية', icon: Library },
-  { to: '/vi/book-request', label: 'طلب كتاب مسموع', icon: BookOpen },
   { to: '/vi/requests', label: 'طلباتي', icon: FileText },
 ];
 
