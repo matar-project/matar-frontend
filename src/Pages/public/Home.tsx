@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { BookOpen, Users, CheckCircle, Library } from 'lucide-react';
+import { BookOpen, Users, CheckCircle, Library, type LucideIcon } from 'lucide-react';
 import { requestsApi } from '../../api/requests';
-import { Button } from '../../Components/ui/Button';
 import { useAuth } from '../../Hooks/auth/UseAuth';
 
-function StatCard({ icon: Icon, value, label }: { icon: any; value: number | string; label: string }) {
+function StatCard({ icon: Icon, value, label }: { icon: LucideIcon; value: number | string; label: string }) {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 text-center">
       <Icon className="mx-auto mb-3 text-primary-600" size={32} aria-hidden="true" />

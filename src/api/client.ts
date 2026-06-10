@@ -10,6 +10,11 @@ interface RetryableRequestConfig extends InternalAxiosRequestConfig {
 }
 
 let refreshPromise: Promise<AuthSession> | null = null;
+const AUTH_ENDPOINTS_WITHOUT_REFRESH = [
+  '/auth/login',
+  '/auth/signup',
+  '/auth/refresh',
+];
 
 export const apiClient = axios.create({
   baseURL: API_URL,
@@ -59,7 +64,16 @@ apiClient.interceptors.response.use(
     logger.error(`Response error: ${status} ${url}`, error.response?.data);
 
     const config = error.config as RetryableRequestConfig | undefined;
-    if (status === 401 && config && !config._retry) {
+    const shouldAttemptRefresh =
+      status === 401 &&
+      config &&
+      !config._retry &&
+      Boolean(localStorage.getItem('accessToken')) &&
+      !AUTH_ENDPOINTS_WITHOUT_REFRESH.some((endpoint) =>
+        config.url?.endsWith(endpoint),
+      );
+
+    if (shouldAttemptRefresh) {
       config._retry = true;
 
       try {

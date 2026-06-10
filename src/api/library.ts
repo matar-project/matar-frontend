@@ -10,16 +10,42 @@ export interface LibraryFilters {
   limit?: number;
 }
 
+export interface LibraryItem {
+  id: number;
+  title: string;
+  author: string | null;
+  subject: string | null;
+  curriculum: string | null;
+  country: string | null;
+  description: string | null;
+  itemType: 'AUDIO' | 'WORD_DOC' | 'PDF' | 'BRAILLE' | 'OTHER';
+  fileUrl: string;
+  fileName: string;
+  fileSize: number | null;
+  published: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LibraryResponse {
+  data: LibraryItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export const libraryApi = {
   getAll: (filters: LibraryFilters = {}) =>
-    apiClient.get('/library', { params: filters }).then((r) => r.data),
+    apiClient.get<LibraryResponse>('/library', { params: filters }).then((r) => r.data),
 
   getOne: (id: number) =>
     apiClient.get(`/library/${id}`).then((r) => r.data),
 
   // Admin
   getAllAdmin: (page = 1, limit = 20) =>
-    apiClient.get('/library/admin/all', { params: { page, limit } }).then((r) => r.data),
+    apiClient
+      .get<LibraryResponse>('/library/admin/all', { params: { page, limit } })
+      .then((r) => r.data),
 
   create: (dto: any) =>
     apiClient.post('/library/admin', dto).then((r) => r.data),

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Download, FileAudio, FileText, File } from 'lucide-react';
+import { Search, Download, FileAudio, FileText, File, type LucideIcon } from 'lucide-react';
 import { libraryApi } from '../../api/library';
 import { InputField } from '../../Components/ui/FormField';
 import { Button } from '../../Components/ui/Button';
 
-const TYPE_LABELS: Record<string, { label: string; icon: any; color: string }> = {
+const TYPE_LABELS: Record<string, { label: string; icon: LucideIcon; color: string }> = {
   AUDIO:    { label: 'صوتي', icon: FileAudio, color: 'text-purple-600 bg-purple-50' },
   WORD_DOC: { label: 'Word', icon: FileText, color: 'text-blue-600 bg-blue-50' },
   PDF:      { label: 'PDF', icon: File, color: 'text-red-600 bg-red-50' },
@@ -34,8 +34,7 @@ export default function Library() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['library', applied, page],
     queryFn: () => libraryApi.getAll({ ...applied, page }),
-    keepPreviousData: true,
-  } as any);
+  });
 
   const applyFilters = () => {
     setPage(1);
@@ -98,7 +97,7 @@ export default function Library() {
             </div>
           ) : (
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="list">
-              {data.data.map((item: any) => (
+              {data.data.map((item) => (
                 <li key={item.id}>
                   <article className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3 h-full flex flex-col">
                     <div className="flex items-start justify-between gap-2">

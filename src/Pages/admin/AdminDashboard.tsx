@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { requestsApi } from '../../api/requests';
 import { volunteersApi } from '../../api/volunteers';
-import { libraryApi } from '../../api/library';
 import { Users, BookOpen, Library, CheckCircle } from 'lucide-react';
 
 function StatCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: number; color: string }) {
@@ -21,7 +20,6 @@ function StatCard({ icon: Icon, label, value, color }: { icon: any; label: strin
 export default function AdminDashboard() {
   const { data: stats } = useQuery({ queryKey: ['stats'], queryFn: requestsApi.getStats });
   const { data: volunteers } = useQuery({ queryKey: ['admin-volunteers'], queryFn: () => volunteersApi.getAll(1, 5) });
-  const { data: library } = useQuery({ queryKey: ['admin-library'], queryFn: () => libraryApi.findAllAdmin ? libraryApi.findAllAdmin(1, 5) : libraryApi.getAllAdmin(1, 5) });
   const { data: requests } = useQuery({ queryKey: ['admin-requests'], queryFn: () => requestsApi.getRequests(1, 5) });
 
   return (
