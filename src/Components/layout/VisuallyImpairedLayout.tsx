@@ -19,7 +19,7 @@ export function VisuallyImpairedLayout() {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b border-teal-700 flex items-center gap-3">
+      <div className="p-4 border-b border-secondary-700 flex items-center gap-3">
         <img src={logo} alt="مشروع مطر" className="h-8 w-auto" />
         <span className="text-white font-bold">بوابة المستفيد</span>
       </div>
@@ -31,7 +31,7 @@ export function VisuallyImpairedLayout() {
             end={end}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                isActive ? 'bg-teal-600 text-white' : 'text-gray-300 hover:bg-teal-800 hover:text-white'
+                isActive ? 'bg-secondary-500 text-white' : 'text-secondary-100 hover:bg-secondary-700 hover:text-white'
               }`
             }
             onClick={() => setSidebarOpen(false)}
@@ -41,13 +41,13 @@ export function VisuallyImpairedLayout() {
           </NavLink>
         ))}
       </nav>
-      <div className="p-4 border-t border-teal-700 space-y-2">
-        <p className="text-xs text-gray-400 truncate">{user?.name}</p>
-        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+      <div className="p-4 border-t border-secondary-700 space-y-2">
+        <p className="text-xs text-secondary-200 truncate">{user?.name}</p>
+        <p className="text-xs text-secondary-300 truncate">{user?.email}</p>
         <button
           type="button"
           onClick={handleLogout}
-          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-300 hover:bg-teal-800 hover:text-white rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-secondary-100 hover:bg-secondary-700 hover:text-white rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           aria-label="تسجيل الخروج"
         >
           <LogOut size={16} aria-hidden="true" />
@@ -59,14 +59,14 @@ export function VisuallyImpairedLayout() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex" dir="rtl">
-      <aside className="hidden lg:block w-64 bg-teal-900 flex-shrink-0" aria-label="الشريط الجانبي">
+      <aside className="hidden lg:block w-64 bg-secondary-900 flex-shrink-0" aria-label="الشريط الجانبي">
         <SidebarContent />
       </aside>
 
       {sidebarOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex">
           <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} aria-hidden="true" />
-          <aside className="relative z-50 w-64 bg-teal-900">
+          <aside className="relative z-50 w-64 bg-secondary-900">
             <SidebarContent />
           </aside>
         </div>
@@ -76,7 +76,7 @@ export function VisuallyImpairedLayout() {
         <header className="bg-white shadow-sm h-14 flex items-center px-4 gap-3">
           <button
             type="button"
-            className="lg:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+            className="lg:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary-500"
             onClick={() => setSidebarOpen(true)}
             aria-label="فتح القائمة الجانبية"
             aria-expanded={sidebarOpen}
