@@ -25,6 +25,23 @@ export const requestsApi = {
       .then((response) => response.data);
   },
 
+  getMyRequests: (params: { page?: number; limit?: number } = {}) =>
+    apiClient.get('/requests/my', { params }).then((r) => r.data),
+
+  downloadOutputFile: async (requestId: number, originalName: string) => {
+    const response = await apiClient.get<Blob>(`/requests/${requestId}/output`, {
+      responseType: 'blob',
+    });
+    const url = URL.createObjectURL(response.data);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = originalName;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  },
+
   getStats: () =>
     apiClient.get('/stats').then((r) => r.data),
 

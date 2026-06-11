@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   useInfiniteQuery,
   useMutation,
@@ -94,6 +94,12 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
 
   const approveCompletion = useMutation({
     mutationFn: () => workflowApi.approveRequestCompletion(request.id),
+    onSuccess: refresh,
+  });
+
+  const outputFileRef = useRef<HTMLInputElement>(null);
+  const uploadOutput = useMutation({
+    mutationFn: (file: File) => workflowApi.uploadOutputFile(request.id, file),
     onSuccess: refresh,
   });
 
@@ -414,6 +420,42 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
                       <Download size={15} aria-hidden="true" />
                       تنزيل ملف PDF
                     </Button>
+                  )}
+                  {request.status === 'DONE' && (
+                    <div className="space-y-1.5 rounded-lg border border-dashed border-gray-300 p-3">
+                      <p className="text-xs font-medium text-gray-700">
+                        الملف المحوّل
+                      </p>
+                      {request.outputOriginalName && (
+                        <p className="truncate text-xs text-gray-500">
+                          {request.outputOriginalName}
+                        </p>
+                      )}
+                      {uploadOutput.isError && (
+                        <p className="text-xs text-red-600">تعذر رفع الملف.</p>
+                      )}
+                      <input
+                        ref={outputFileRef}
+                        type="file"
+                        accept=".docx,.doc,.mp3,.wav,.ogg,.aac,.m4a"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) uploadOutput.mutate(file);
+                          e.target.value = '';
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="w-full bg-white"
+                        loading={uploadOutput.isPending}
+                        onClick={() => outputFileRef.current?.click()}
+                      >
+                        {request.outputOriginalName ? 'استبدال الملف' : 'رفع الملف المحوّل'}
+                      </Button>
+                    </div>
                   )}
                 </div>
               </aside>
