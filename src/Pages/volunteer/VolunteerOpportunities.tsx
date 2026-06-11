@@ -26,9 +26,11 @@ const requestTypeLabels = {
   ACCOMPANIMENT: "طلب مرافقة",
 };
 
-interface RangeValue {
-  endPage: string;
-}
+// Minimum pages per request type
+const MIN_PAGES: Record<string, number> = {
+  PDF_TO_WORD: 3,
+  PDF_TO_AUDIO: 10,
+};
 
 function mergePageRanges(
   ranges: Array<{ startPage: number; endPage: number }>,
@@ -184,30 +186,48 @@ function OpportunityRow({
 
 function ServiceRequestRow({
   request,
-  value,
-  onChange,
   onReserve,
   onClaim,
   pending,
   error,
 }: {
   request: AvailableRequest;
-  value: RangeValue;
-  onChange: (value: RangeValue) => void;
-  onReserve: () => void;
+  onReserve: (endPage: number) => void;
   onClaim: () => void;
   pending: boolean;
   error?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [multiplier, setMultiplier] = useState(1);
+
   const startPage = request.nextAvailablePage ?? 1;
-  const endPage = Number(value.endPage);
-  const invalidRange =
-    !Number.isInteger(endPage) ||
-    startPage < 1 ||
-    endPage < startPage ||
-    endPage > (request.totalPages ?? 0);
-  const allPagesReserved = startPage > (request.totalPages ?? 0);
+  const totalPages = request.totalPages ?? 0;
+  const remaining = totalPages - startPage + 1;
+  const allPagesReserved = startPage > totalPages && totalPages > 0;
+  const minPages = MIN_PAGES[request.requestType] ?? 3;
+
+  // Build multiplier options: 1×, 2×, 3×... capped by remaining pages
+  const multiplierOptions: Array<{ n: number; pages: number }> = [];
+  for (let n = 1; n <= 8; n++) {
+    const pages = n * minPages;
+    if (pages > remaining) break;
+    multiplierOptions.push({ n, pages });
+  }
+  // If no full multiple fits but pages remain, offer all remaining
+  if (multiplierOptions.length === 0 && remaining > 0) {
+    multiplierOptions.push({ n: 1, pages: remaining });
+  }
+
+  // Clamp selected multiplier to a valid option
+  const activeN =
+    multiplierOptions.some((o) => o.n === multiplier)
+      ? multiplier
+      : (multiplierOptions[0]?.n ?? 1);
+  const activeOption = multiplierOptions.find((o) => o.n === activeN);
+  const computedEndPage = activeOption
+    ? Math.min(startPage + activeOption.pages - 1, totalPages)
+    : 0;
+
   const displayName =
     request.bookName ??
     request.title ??
@@ -304,44 +324,52 @@ function ServiceRequestRow({
                 >
                   قبول طلب المرافقة
                 </Button>
+              ) : allPagesReserved ? (
+                <p className="text-xs text-gray-500">
+                  تم حجز جميع صفحات هذا الطلب.
+                </p>
               ) : (
                 <>
-                  <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-1">
-                    <label className="space-y-1 text-sm">
-                      <span className="font-medium text-gray-700">من صفحة</span>
-                      <input
-                        type="number"
-                        value={startPage}
-                        readOnly
-                        disabled
-                        className="w-full rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-gray-600"
-                      />
-                    </label>
-                    <label className="space-y-1 text-sm">
-                      <span className="font-medium text-gray-700">
-                        إلى صفحة
-                      </span>
-                      <input
-                        type="number"
-                        min={startPage}
-                        max={request.totalPages ?? undefined}
-                        value={value.endPage}
-                        onChange={(event) =>
-                          onChange({ endPage: event.target.value })
-                        }
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2"
-                      />
-                    </label>
+                  <div>
+                    <p className="mb-2 text-sm font-medium text-gray-700">
+                      اختر حجم المهمة
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {multiplierOptions.map(({ n, pages }) => (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => setMultiplier(n)}
+                          className={`rounded-lg border px-3 py-1.5 text-sm transition-colors ${
+                            activeN === n
+                              ? "border-primary-600 bg-primary-50 font-medium text-primary-700"
+                              : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+                          }`}
+                        >
+                          {pages} صفحة
+                        </button>
+                      ))}
+                    </div>
                   </div>
+
+                  {activeOption && (
+                    <p className="rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-700">
+                      ستعمل على الصفحات من{" "}
+                      <strong>{startPage}</strong> إلى{" "}
+                      <strong>{computedEndPage}</strong>
+                    </p>
+                  )}
+
                   <Button
                     size="sm"
                     className="w-full"
                     loading={pending}
-                    disabled={invalidRange || allPagesReserved}
-                    onClick={onReserve}
+                    disabled={!activeOption}
+                    onClick={() => onReserve(computedEndPage)}
                   >
                     حجز الصفحات
                   </Button>
+
                   {request.pdfOriginalName && (
                     <Button
                       type="button"
@@ -359,11 +387,6 @@ function ServiceRequestRow({
                       تنزيل ملف PDF
                     </Button>
                   )}
-                  {allPagesReserved && (
-                    <p className="text-xs text-gray-500">
-                      تم حجز جميع صفحات هذا الطلب.
-                    </p>
-                  )}
                 </>
               )}
               {error && <p className="text-sm text-red-600">{error}</p>}
@@ -379,7 +402,6 @@ export default function VolunteerOpportunities() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 500);
-  const [ranges, setRanges] = useState<Record<number, RangeValue>>({});
   const [requestErrors, setRequestErrors] = useState<Record<number, string>>(
     {},
   );
@@ -428,10 +450,6 @@ export default function VolunteerOpportunities() {
       endPage: number;
     }) => workflowApi.reservePages(requestId, endPage),
     onSuccess: (_, variables) => {
-      setRanges((current) => ({
-        ...current,
-        [variables.requestId]: { endPage: "" },
-      }));
       setRequestErrors((current) => ({
         ...current,
         [variables.requestId]: "",
@@ -531,36 +549,23 @@ export default function VolunteerOpportunities() {
             لا توجد طلبات خدمة متاحة حالياً.
           </p>
         )}
-        {requests.map((request) => {
-          const value = ranges[request.id] ?? { endPage: "" };
-          return (
-            <ServiceRequestRow
-              key={request.id}
-              request={request}
-              value={value}
-              onChange={(next) =>
-                setRanges((current) => ({
-                  ...current,
-                  [request.id]: next,
-                }))
-              }
-              onReserve={() =>
-                reserve.mutate({
-                  requestId: request.id,
-                  endPage: Number(value.endPage),
-                })
-              }
-              onClaim={() => claimAccompaniment.mutate(request.id)}
-              pending={
-                (reserve.isPending &&
-                  reserve.variables?.requestId === request.id) ||
-                (claimAccompaniment.isPending &&
-                  claimAccompaniment.variables === request.id)
-              }
-              error={requestErrors[request.id]}
-            />
-          );
-        })}
+        {requests.map((request) => (
+          <ServiceRequestRow
+            key={request.id}
+            request={request}
+            onReserve={(endPage) =>
+              reserve.mutate({ requestId: request.id, endPage })
+            }
+            onClaim={() => claimAccompaniment.mutate(request.id)}
+            pending={
+              (reserve.isPending &&
+                reserve.variables?.requestId === request.id) ||
+              (claimAccompaniment.isPending &&
+                claimAccompaniment.variables === request.id)
+            }
+            error={requestErrors[request.id]}
+          />
+        ))}
         <InfiniteScrollTrigger
           hasNextPage={Boolean(requestsQuery.hasNextPage)}
           isFetchingNextPage={requestsQuery.isFetchingNextPage}
