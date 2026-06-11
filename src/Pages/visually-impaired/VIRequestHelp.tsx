@@ -194,16 +194,20 @@ export default function VIRequestHelp() {
                     day: 'numeric',
                   })}
                 </p>
-                {req.status === 'DONE' && req.outputOriginalName && (
-                  <button
-                    onClick={() =>
-                      void requestsApi.downloadOutputFile(req.id, req.outputOriginalName)
-                    }
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-teal-50 px-3 py-1.5 text-xs font-medium text-teal-700 hover:bg-teal-100 transition-colors"
-                  >
-                    <Download size={13} aria-hidden="true" />
-                    تنزيل الملف المحوّل
-                  </button>
+                {req.status === 'DONE' && (
+                  req.outputOriginalName ? (
+                    <button
+                      onClick={() =>
+                        void requestsApi.downloadOutputFile(req.id, req.outputOriginalName)
+                      }
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-teal-50 px-3 py-1.5 text-xs font-medium text-teal-700 hover:bg-teal-100 transition-colors"
+                    >
+                      <Download size={13} aria-hidden="true" />
+                      تنزيل الملف المحوّل
+                    </button>
+                  ) : (
+                    <span className="text-xs text-gray-400">الملف قيد الإعداد...</span>
+                  )
                 )}
               </div>
             </div>
