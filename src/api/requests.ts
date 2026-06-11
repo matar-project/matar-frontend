@@ -25,6 +25,9 @@ export const requestsApi = {
       .then((response) => response.data);
   },
 
+  getMyRequests: (params: { page?: number; limit?: number } = {}) =>
+    apiClient.get('/requests/my', { params }).then((r) => r.data),
+
   getStats: () =>
     apiClient.get('/stats').then((r) => r.data),
 
