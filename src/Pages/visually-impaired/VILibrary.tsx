@@ -1,18 +1,42 @@
 import { useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { BookOpen, FileText, Headphones } from 'lucide-react';
-import { libraryApi } from '../../api/library';
+import { BookOpen, FileText, Headphones, File, Download } from 'lucide-react';
+import { libraryApi, type LibraryItem } from '../../api/library';
 import { InfiniteScrollTrigger } from '../../Components/InfiniteScrollTrigger';
 import { useDebouncedValue } from '../../Hooks/useDebouncedValue';
+
+const typeIcon: Record<LibraryItem['itemType'], React.ElementType> = {
+  AUDIO: Headphones,
+  WORD_DOC: FileText,
+  PDF: FileText,
+  BRAILLE: BookOpen,
+  OTHER: File,
+};
+
+const typeLabel: Record<LibraryItem['itemType'], string> = {
+  AUDIO: 'تسجيل صوتي',
+  WORD_DOC: 'ملف Word',
+  PDF: 'PDF',
+  BRAILLE: 'برايل',
+  OTHER: 'أخرى',
+};
+
+const typeColor: Record<LibraryItem['itemType'], string> = {
+  AUDIO: 'bg-teal-100 text-teal-600',
+  WORD_DOC: 'bg-blue-100 text-blue-600',
+  PDF: 'bg-red-100 text-red-600',
+  BRAILLE: 'bg-purple-100 text-purple-600',
+  OTHER: 'bg-gray-100 text-gray-600',
+};
 
 export default function VILibrary() {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 500);
 
   const booksQuery = useInfiniteQuery({
-    queryKey: ['system-library-books', debouncedSearch],
+    queryKey: ['vi-library-items', debouncedSearch],
     queryFn: ({ pageParam }) =>
-      libraryApi.getSystemBooks({
+      libraryApi.getAll({
         search: debouncedSearch || undefined,
         page: pageParam,
         limit: 10,
@@ -42,52 +66,80 @@ export default function VILibrary() {
           type="search"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="ابحث باسم الكتاب..."
+          placeholder="ابحث باسم الكتاب أو المؤلف..."
           className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-teal-500"
         />
       </div>
 
-      {booksQuery.isLoading && <p className="text-sm text-gray-500">جاري التحميل...</p>}
+      {booksQuery.isLoading && (
+        <p className="text-sm text-gray-500">جاري التحميل...</p>
+      )}
 
       {!booksQuery.isLoading && books.length === 0 && (
         <p className="rounded-xl bg-white p-5 text-sm text-gray-500 shadow-sm">
-          لا توجد كتب مكتملة حتى الآن.
+          لا توجد كتب متاحة حتى الآن.
         </p>
       )}
 
       {books.length > 0 && (
-        <ul className="grid gap-3 md:grid-cols-2" role="list">
-          {books.map((book) => (
-            <li
-              key={book.id}
-              className="flex items-start gap-3 rounded-xl bg-white p-4 shadow-sm"
-            >
-              <div className="mt-0.5 shrink-0 rounded-lg bg-purple-100 p-2">
-                <BookOpen
-                  size={18}
-                  className="text-purple-600"
-                  aria-hidden="true"
-                />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-gray-900">{book.name}</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {book.wordCompleted && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
-                      <FileText size={14} aria-hidden="true" />
-                      Word مكتمل
-                    </span>
-                  )}
-                  {book.audioCompleted && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700">
-                      <Headphones size={14} aria-hidden="true" />
-                      صوتي مكتمل
-                    </span>
-                  )}
+        <ul className="space-y-3" role="list">
+          {books.map((book) => {
+            const Icon = typeIcon[book.itemType] ?? File;
+            return (
+              <li
+                key={book.id}
+                className="rounded-xl bg-white p-5 shadow-sm space-y-3"
+              >
+                <div className="flex items-start gap-3">
+                  <div
+                    className={`mt-0.5 shrink-0 rounded-lg p-2 ${typeColor[book.itemType] ?? 'bg-gray-100 text-gray-600'}`}
+                  >
+                    <Icon size={18} aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-gray-900">{book.title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {typeLabel[book.itemType]}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </li>
-          ))}
+
+                {(book.author || book.subject || book.description) && (
+                  <dl className="space-y-1 text-sm text-gray-600">
+                    {book.author && (
+                      <div className="flex gap-2">
+                        <dt className="shrink-0 text-gray-400">المؤلف:</dt>
+                        <dd>{book.author}</dd>
+                      </div>
+                    )}
+                    {book.subject && (
+                      <div className="flex gap-2">
+                        <dt className="shrink-0 text-gray-400">الموضوع:</dt>
+                        <dd>{book.subject}</dd>
+                      </div>
+                    )}
+                    {book.description && (
+                      <div className="flex gap-2">
+                        <dt className="shrink-0 text-gray-400">الوصف:</dt>
+                        <dd className="line-clamp-2">{book.description}</dd>
+                      </div>
+                    )}
+                  </dl>
+                )}
+
+                <a
+                  href={book.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download={book.fileName}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-teal-50 px-3 py-1.5 text-xs font-medium text-teal-700 hover:bg-teal-100 transition-colors"
+                >
+                  <Download size={13} aria-hidden="true" />
+                  تنزيل الملف
+                </a>
+              </li>
+            );
+          })}
         </ul>
       )}
 

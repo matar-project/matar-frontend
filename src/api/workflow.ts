@@ -23,6 +23,8 @@ export interface WorkflowRequest {
   pdfStoredName: string | null;
   pdfMimeType: string | null;
   pdfFileSize: number | null;
+  outputOriginalName: string | null;
+  outputStoredName: string | null;
   totalPages: number | null;
   status: CoordinatorRequestStatus;
   coordinatorNotes: string | null;
@@ -125,6 +127,30 @@ export interface AccompanimentAssignment {
 }
 
 export const workflowApi = {
+  uploadOutputFile: (requestId: number, file: File) => {
+    const formData = new FormData();
+    formData.append('outputFile', file);
+    return apiClient
+      .post(
+        `/coordinator/requests/${requestId}/output`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
+      )
+      .then((r) => r.data);
+  },
+  downloadOutputFile: async (requestId: number, originalName: string) => {
+    const response = await apiClient.get<Blob>(`/requests/${requestId}/output`, {
+      responseType: 'blob',
+    });
+    const url = URL.createObjectURL(response.data);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = originalName;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  },
   downloadRequestPdf: async (requestId: number, originalName: string) => {
     const response = await apiClient.get<Blob>(`/requests/${requestId}/pdf`, {
       responseType: 'blob',

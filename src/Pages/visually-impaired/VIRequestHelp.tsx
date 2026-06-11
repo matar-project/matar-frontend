@@ -3,6 +3,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-q
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
+import { Download } from 'lucide-react';
 import { requestsApi, type CreateRequestDto } from '../../api/requests';
 import { Button } from '../../Components/ui/Button';
 import { InputField, SelectField, TextareaField } from '../../Components/ui/FormField';
@@ -185,13 +186,26 @@ export default function VIRequestHelp() {
                   ملاحظة الموزع: {req.coordinatorNotes}
                 </p>
               )}
-              <p className="text-xs text-gray-400">
-                {new Date(req.createdAt).toLocaleDateString('ar-JO', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </p>
+              <div className="flex items-center justify-between gap-3 pt-1">
+                <p className="text-xs text-gray-400">
+                  {new Date(req.createdAt).toLocaleDateString('ar-JO', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </p>
+                {req.status === 'DONE' && req.outputOriginalName && (
+                  <button
+                    onClick={() =>
+                      void requestsApi.downloadOutputFile(req.id, req.outputOriginalName)
+                    }
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-teal-50 px-3 py-1.5 text-xs font-medium text-teal-700 hover:bg-teal-100 transition-colors"
+                  >
+                    <Download size={13} aria-hidden="true" />
+                    تنزيل الملف المحوّل
+                  </button>
+                )}
+              </div>
             </div>
           ))}
           <InfiniteScrollTrigger
