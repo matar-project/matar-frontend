@@ -31,15 +31,15 @@ export function Navbar() {
   ];
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50" role="banner">
+    <header className="bg-primary-600 shadow-md sticky top-0 z-50" role="banner">
       <nav
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16"
         aria-label="التنقل الرئيسي"
       >
         {/* Logo */}
-        <Link to={logoPath} className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 rounded-md">
+        <Link to={logoPath} className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-md">
           <img src={logo} alt="مشروع مطر" className="h-10 w-auto" />
-          <span className="text-primary-700 font-bold text-lg hidden sm:inline">مشروع مطر</span>
+          <span className="text-white font-bold text-lg hidden sm:inline">مشروع مطر</span>
         </Link>
 
         {/* Desktop nav */}
@@ -50,10 +50,10 @@ export function Navbar() {
                 to={link.to}
                 end={link.to === '/'}
                 className={({ isActive }) =>
-                  `px-3 py-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 ${
+                  `px-3 py-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
                     isActive
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      ? 'bg-white/20 text-white'
+                      : 'text-primary-100 hover:bg-white/10 hover:text-white'
                   }`
                 }
               >
@@ -68,7 +68,7 @@ export function Navbar() {
           {canRequestHelp && (
             <Link
               to="/vi/requests"
-              className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 transition-colors"
+              className="px-4 py-2 bg-secondary-500 text-white text-sm font-medium rounded-lg hover:bg-secondary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-600 transition-colors"
             >
               اطلب مساعدة
             </Link>
@@ -78,14 +78,14 @@ export function Navbar() {
             <>
               <Link
                 to={dashboardPath}
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white border border-white/40 rounded-lg hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors"
               >
                 {user?.name}
               </Link>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-primary-100 hover:text-white hover:bg-white/10 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors"
                 aria-label="تسجيل الخروج"
               >
                 <LogOut size={16} aria-hidden="true" />
@@ -95,7 +95,7 @@ export function Navbar() {
           ) : (
             <Link
               to="/login"
-              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white border border-white/40 rounded-lg hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors"
             >
               <LogIn size={16} aria-hidden="true" />
               تسجيل الدخول
@@ -106,7 +106,7 @@ export function Navbar() {
         {/* Mobile menu button */}
         <button
           type="button"
-          className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
+          className="md:hidden p-2 rounded-md text-primary-100 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           aria-controls="mobile-menu"
           aria-expanded={open}
           aria-label={open ? 'إغلاق القائمة' : 'فتح القائمة'}
@@ -118,7 +118,7 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {open && (
-        <div id="mobile-menu" className="md:hidden border-t border-gray-200 bg-white">
+        <div id="mobile-menu" className="md:hidden border-t border-white/20 bg-primary-700">
           <ul className="px-4 py-3 space-y-1" role="list">
             {visibleNavLinks.map((link) => (
               <li key={link.to}>
@@ -129,8 +129,8 @@ export function Navbar() {
                   className={({ isActive }) =>
                     `block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                       isActive
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-white/20 text-white'
+                        : 'text-primary-100 hover:bg-white/10 hover:text-white'
                     }`
                   }
                 >
@@ -143,7 +143,7 @@ export function Navbar() {
                 <Link
                   to="/vi/requests"
                   onClick={() => setOpen(false)}
-                  className="block px-3 py-2 mt-2 bg-primary-600 text-white text-base font-medium rounded-lg text-center"
+                  className="block px-3 py-2 mt-2 bg-secondary-500 text-white text-base font-medium rounded-lg text-center"
                 >
                   اطلب مساعدة
                 </Link>
@@ -151,18 +151,18 @@ export function Navbar() {
             )}
             <li>
               {isAuthenticated ? (
-                <div className="space-y-1 pt-1 border-t border-gray-100 mt-2">
+                <div className="space-y-1 pt-1 border-t border-white/20 mt-2">
                   <Link
                     to={dashboardPath}
                     onClick={() => setOpen(false)}
-                    className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-md"
+                    className="block px-3 py-2 text-base font-medium text-primary-100 hover:bg-white/10 hover:text-white rounded-md"
                   >
                     لوحة التحكم ({user?.name})
                   </Link>
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-base font-medium text-red-600 hover:bg-red-50 rounded-md"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-base font-medium text-red-300 hover:bg-red-500/20 hover:text-red-100 rounded-md"
                   >
                     <LogOut size={16} aria-hidden="true" />
                     تسجيل الخروج
@@ -172,7 +172,7 @@ export function Navbar() {
                 <Link
                   to="/login"
                   onClick={() => setOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 mt-1 text-base font-medium text-gray-700 border border-gray-300 rounded-lg"
+                  className="flex items-center gap-2 px-3 py-2 mt-1 text-base font-medium text-white border border-white/40 rounded-lg hover:bg-white/10"
                 >
                   <LogIn size={16} aria-hidden="true" />
                   تسجيل الدخول

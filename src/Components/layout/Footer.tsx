@@ -10,13 +10,13 @@ export function Footer() {
   });
 
   return (
-    <footer className="bg-gray-900 text-gray-300 mt-auto" role="contentinfo">
+    <footer className="bg-primary-900 text-primary-200 mt-auto" role="contentinfo">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
             <h2 className="text-white text-xl font-bold mb-3">مشروع مطر</h2>
-            <p className="text-gray-400 text-sm leading-relaxed">
+            <p className="text-primary-300 text-sm leading-relaxed">
               إعطاء المكفوفين الفرصة التعليمية والثقافية المتكافئة
             </p>
           </div>
@@ -95,7 +95,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-gray-800 text-center text-sm text-gray-500">
+        <div className="mt-10 pt-6 border-t border-primary-700 text-center text-sm text-primary-400">
           <p>© {new Date().getFullYear()} مشروع مطر. جميع الحقوق محفوظة.</p>
         </div>
       </div>

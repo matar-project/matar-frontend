@@ -21,7 +21,7 @@ body {
 
 /* Ensure focus rings are visible for keyboard navigation */
 :focus-visible {
-  outline: 3px solid #2563eb;
+  outline: 3px solid #1A2E6E;
   outline-offset: 2px;
 }
 
@@ -55,7 +55,7 @@ html {
 
 .international-phone-input:focus-within {
   border-color: transparent;
-  box-shadow: 0 0 0 2px #3b82f6;
+  box-shadow: 0 0 0 2px #1A2E6E;
 }
 
 .international-phone-input-error {
@@ -93,7 +93,7 @@ html {
 
 .searchable-country__control--is-focused {
   border-color: transparent !important;
-  box-shadow: 0 0 0 2px #3b82f6 !important;
+  box-shadow: 0 0 0 2px #1A2E6E !important;
 }
 
 .searchable-country-error .searchable-country__control {

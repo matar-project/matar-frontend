@@ -29,7 +29,7 @@ export function CoordinatorLayout() {
 
   const sidebar = (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-3 border-b border-cyan-800 p-4">
+      <div className="flex items-center gap-3 border-b border-matar-tealGreen p-4">
         <img src={logo} alt="مشروع مطر" className="h-8 w-auto" />
         <span className="font-bold text-white">بوابة الموزع</span>
       </div>
@@ -41,8 +41,8 @@ export function CoordinatorLayout() {
             end={end}
             onClick={() => setSidebarOpen(false)}
             className={({ isActive }) =>
-              `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                isActive ? 'bg-cyan-600 text-white' : 'text-cyan-50 hover:bg-cyan-800'
+              `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
+                isActive ? 'bg-matar-teal text-white' : 'text-secondary-100 hover:bg-secondary-800 hover:text-white'
               }`
             }
           >
@@ -51,12 +51,12 @@ export function CoordinatorLayout() {
           </NavLink>
         ))}
       </nav>
-      <div className="space-y-2 border-t border-cyan-800 p-4">
-        <p className="truncate text-xs text-cyan-100">{user?.name}</p>
+      <div className="space-y-2 border-t border-matar-tealGreen p-4">
+        <p className="truncate text-xs text-secondary-200">{user?.name}</p>
         <button
           type="button"
           onClick={handleLogout}
-          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-cyan-50 hover:bg-cyan-800"
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-secondary-100 hover:bg-secondary-800 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
         >
           <LogOut size={16} aria-hidden="true" />
           تسجيل الخروج
@@ -67,7 +67,7 @@ export function CoordinatorLayout() {
 
   return (
     <div className="flex min-h-screen bg-gray-100" dir="rtl">
-      <aside className="hidden w-64 flex-shrink-0 bg-cyan-950 lg:block">{sidebar}</aside>
+      <aside className="hidden w-64 flex-shrink-0 bg-secondary-900 lg:block">{sidebar}</aside>
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 flex lg:hidden">
           <button
@@ -76,7 +76,7 @@ export function CoordinatorLayout() {
             onClick={() => setSidebarOpen(false)}
             aria-label="إغلاق القائمة"
           />
-          <aside className="relative z-50 w-64 bg-cyan-950">{sidebar}</aside>
+          <aside className="relative z-50 w-64 bg-secondary-900">{sidebar}</aside>
         </div>
       )}
       <div className="flex min-w-0 flex-1 flex-col">

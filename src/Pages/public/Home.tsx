@@ -7,7 +7,7 @@ import { useAuth } from '../../Hooks/auth/UseAuth';
 function StatCard({ icon: Icon, value, label }: { icon: LucideIcon; value: number | string; label: string }) {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-      <Icon className="mx-auto mb-3 text-primary-600" size={32} aria-hidden="true" />
+      <Icon className="mx-auto mb-3 text-secondary-500" size={32} aria-hidden="true" />
       <div className="text-3xl font-bold text-gray-900 mb-1">{value}</div>
       <div className="text-gray-500 text-sm">{label}</div>
     </div>
@@ -38,9 +38,26 @@ export default function Home() {
 
       {/* Hero */}
       <section
-        className="bg-gradient-to-bl from-primary-700 via-primary-600 to-primary-800 text-white py-20 px-4"
+        className="bg-primary-600 text-white py-20 px-4 relative overflow-hidden"
         aria-label="قسم الترحيب"
       >
+        {/* Decorative multi-color bar strip — echoes the logo mark */}
+        <div className="absolute bottom-0 left-0 right-0 flex h-2" aria-hidden="true">
+          <div className="flex-1 bg-matar-red" />
+          <div className="flex-1 bg-matar-orangeRed" />
+          <div className="flex-1 bg-matar-amber" />
+          <div className="flex-1 bg-matar-orange" />
+          <div className="flex-1 bg-matar-darkGreen" />
+          <div className="flex-1 bg-matar-green" />
+          <div className="flex-1 bg-matar-teal" />
+          <div className="flex-1 bg-matar-tealGreen" />
+          <div className="flex-1 bg-matar-blue" />
+          <div className="flex-1 bg-matar-purple" />
+          <div className="flex-1 bg-matar-lavender" />
+          <div className="flex-1 bg-matar-hotPink" />
+          <div className="flex-1 bg-matar-pinkRed" />
+          <div className="flex-1 bg-matar-darkRed" />
+        </div>
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
             مشروع مطر
@@ -52,7 +69,7 @@ export default function Home() {
             {canRequestHelp && (
               <Link
                 to="/vi/requests"
-                className="px-7 py-4 text-lg font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white bg-white text-primary-700 hover:bg-primary-50 inline-flex items-center justify-center"
+                className="px-7 py-4 text-lg font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white bg-white text-primary-600 hover:bg-primary-50 inline-flex items-center justify-center"
                 aria-label="اطلب مساعدة من مشروع مطر"
               >
                 اطلب مساعدة
@@ -93,7 +110,7 @@ export default function Home() {
               { step: '٣', title: 'إتاحة المواد', desc: 'تُضاف المواد المحوّلة إلى المكتبة لتستفيد منها أوسع شريحة ممكنة.' },
             ].map((item) => (
               <div key={item.step} className="bg-white rounded-xl p-6 shadow-sm text-center space-y-3">
-                <div className="w-12 h-12 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-xl font-bold mx-auto" aria-hidden="true">
+                <div className="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto" aria-hidden="true">
                   {item.step}
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
@@ -106,7 +123,7 @@ export default function Home() {
 
       {/* Stats */}
       {stats && (
-        <section className="py-16 px-4 bg-primary-700 text-white" aria-label="إحصاءات المشروع">
+        <section className="py-16 px-4 bg-primary-600 text-white" aria-label="إحصاءات المشروع">
           <div className="max-w-5xl mx-auto">
             <h2 className="text-3xl font-bold text-center mb-12">أثرنا</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -127,7 +144,7 @@ export default function Home() {
             {stories.map((s) => (
               <blockquote key={s.name} className="bg-gray-50 rounded-xl p-6 space-y-4">
                 <p className="text-gray-700 leading-relaxed">"{s.text}"</p>
-                <footer className="text-sm font-medium text-primary-700">— {s.name}</footer>
+                <footer className="text-sm font-medium text-primary-600">— {s.name}</footer>
               </blockquote>
             ))}
           </div>
@@ -135,7 +152,16 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-secondary-600 text-white" aria-label="دعوة للمشاركة">
+      <section className="py-16 px-4 bg-secondary-500 text-white relative overflow-hidden" aria-label="دعوة للمشاركة">
+        {/* Top accent strip */}
+        <div className="absolute top-0 left-0 right-0 flex h-1.5" aria-hidden="true">
+          <div className="flex-1 bg-matar-red" />
+          <div className="flex-1 bg-matar-amber" />
+          <div className="flex-1 bg-matar-green" />
+          <div className="flex-1 bg-matar-navy" />
+          <div className="flex-1 bg-matar-purple" />
+          <div className="flex-1 bg-matar-hotPink" />
+        </div>
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <h2 className="text-3xl font-bold">انضم إلى مجتمع مطر</h2>
           <p className="text-secondary-100 text-lg">
@@ -153,7 +179,7 @@ export default function Home() {
             {canVolunteer && (
               <Link
                 to="/volunteer-dashboard/opportunities"
-                className="px-8 py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-secondary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors text-center"
+                className="px-8 py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-secondary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors text-center"
               >
                 تطوع معنا
               </Link>
