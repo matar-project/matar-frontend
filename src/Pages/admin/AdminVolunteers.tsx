@@ -1,35 +1,14 @@
 import { useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { Mail, MapPin, Phone } from 'lucide-react';
-import { volunteersApi } from '../../api/volunteers';
 import { InfiniteScrollTrigger } from '../../Components/InfiniteScrollTrigger';
+import { VolunteerCard } from '../../Components/admin/VolunteerCard';
+import { useAdminVolunteersInfiniteQuery } from '../../Hooks/admin/queries/useAdminVolunteersInfiniteQuery';
 import { useDebouncedValue } from '../../Hooks/useDebouncedValue';
-
-interface VolunteerUser {
-  id: number;
-  name: string;
-  email: string;
-  phone: string | null;
-  country: string | null;
-  city: string | null;
-  createdAt: string;
-}
 
 export default function AdminVolunteers() {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 500);
-  const volunteersQuery = useInfiniteQuery({
-    queryKey: ['admin-volunteers-list', debouncedSearch],
-    queryFn: ({ pageParam }) =>
-      volunteersApi.getAll({
-        page: pageParam,
-        limit: 10,
-        search: debouncedSearch || undefined,
-      }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasMore ? lastPage.page + 1 : undefined,
-  });
+  const volunteersQuery =
+    useAdminVolunteersInfiniteQuery(debouncedSearch);
   const volunteers =
     volunteersQuery.data?.pages.flatMap((page) => page.data) ?? [];
   const total = volunteersQuery.data?.pages[0]?.total ?? 0;
@@ -69,42 +48,10 @@ export default function AdminVolunteers() {
         <>
           <p className="text-sm text-gray-500">{total} متطوع</p>
           <ul className="grid gap-3 md:grid-cols-2" role="list">
-            {volunteers.map((volunteer: VolunteerUser) => (
-              <li
-                key={volunteer.id}
-                className="space-y-3 rounded-xl bg-white p-5 shadow-sm"
-              >
-                <div>
-                  <p className="font-semibold text-gray-900">
-                    {volunteer.name}
-                  </p>
-                  <p className="mt-1 text-xs text-gray-400">
-                    انضم في{' '}
-                    {new Date(volunteer.createdAt).toLocaleDateString(
-                      'ar-JO-u-nu-latn',
-                    )}
-                  </p>
-                </div>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <p className="flex items-center gap-2">
-                    <Phone size={15} aria-hidden="true" />
-                    <bdi dir="ltr">{volunteer.phone ?? '-'}</bdi>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Mail size={15} aria-hidden="true" />
-                    {volunteer.email}
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <MapPin size={15} aria-hidden="true" />
-                    {[volunteer.country, volunteer.city]
-                      .filter(Boolean)
-                      .join('، ') || '-'}
-                  </p>
-                </div>
-              </li>
+            {volunteers.map((volunteer) => (
+              <VolunteerCard key={volunteer.id} volunteer={volunteer} />
             ))}
           </ul>
-
           <InfiniteScrollTrigger
             hasNextPage={Boolean(volunteersQuery.hasNextPage)}
             isFetchingNextPage={volunteersQuery.isFetchingNextPage}

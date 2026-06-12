@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { ListParams } from './pagination';
+import type { ListParams, PaginatedResponse } from './pagination';
 
 export interface PublicSettings {
   whatsappLink: string | null;
@@ -9,7 +9,23 @@ export interface PublicSettings {
   coordinatorPhone: string | null;
 }
 
-interface OpportunityInput {
+export interface UpdateSettingsDto {
+  whatsappLink?: string;
+  facebookLink?: string;
+  messengerLink?: string;
+}
+
+export interface Opportunity {
+  id: number;
+  title: string;
+  description: string | null;
+  subject: string | null;
+  totalPages: number | null;
+  remainingPages: number | null;
+  status: string;
+}
+
+export interface OpportunityInput {
   title?: string;
   description?: string;
   subject?: string;
@@ -20,13 +36,15 @@ interface OpportunityInput {
 
 export const settingsApi = {
   get: () => apiClient.get<PublicSettings>('/settings').then((r) => r.data),
-  update: (dto: { whatsappLink?: string; facebookLink?: string; messengerLink?: string }) =>
+  update: (dto: UpdateSettingsDto) =>
     apiClient.put('/settings/admin', dto).then((r) => r.data),
 };
 
 export const opportunitiesApi = {
   getAll: (params: ListParams = {}) =>
-    apiClient.get('/opportunities', { params }).then((r) => r.data),
+    apiClient
+      .get<PaginatedResponse<Opportunity>>('/opportunities', { params })
+      .then((r) => r.data),
   create: (dto: OpportunityInput) =>
     apiClient.post('/opportunities/admin', dto).then((r) => r.data),
   update: (id: number, dto: OpportunityInput) =>

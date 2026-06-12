@@ -1,16 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../Hooks/auth/UseAuth';
-import { libraryApi } from '../../api/library';
 import { Library, FileText, BookOpen, Phone } from 'lucide-react';
 import { CoordinatorContactCard } from '../../Components/CoordinatorContactCard';
+import { useRecentLibraryQuery } from '../../Hooks/library/queries/useRecentLibraryQuery';
 
 export default function VIDashboard() {
   const { user } = useAuth();
-  const { data: library } = useQuery({
-    queryKey: ['vi-library'],
-    queryFn: () => libraryApi.getAll({ limit: 5 }),
-  });
+  const { data: library } = useRecentLibraryQuery();
 
   const recentBooks = library?.data ?? [];
 
@@ -72,7 +68,7 @@ export default function VIDashboard() {
         <section aria-label="أحدث الكتب في المكتبة">
           <h2 className="text-lg font-semibold text-gray-800 mb-3">أحدث الكتب المتاحة</h2>
           <ul className="space-y-3">
-            {recentBooks.map((book: any) => (
+            {recentBooks.map((book) => (
               <li key={book.id} className="bg-white rounded-xl shadow-sm p-4 flex items-start gap-3">
                 <div className="p-2 rounded-lg bg-purple-100 mt-0.5">
                   <BookOpen size={16} className="text-purple-600" aria-hidden="true" />

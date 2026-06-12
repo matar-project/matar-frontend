@@ -1,4 +1,42 @@
 import { apiClient } from './client';
+import type { PaginatedResponse } from './pagination';
+
+export interface DashboardStats {
+  totalVolunteers: number;
+  totalRequests: number;
+  completedRequests: number;
+  libraryItems: number;
+}
+
+export interface AdminRequest {
+  id: number;
+  fullName: string;
+  phone: string;
+  email: string | null;
+  city: string;
+  requestType: string;
+  bookName: string | null;
+  details: string;
+  notes: string | null;
+  status: string;
+  createdAt: string;
+}
+
+export interface UpdateAdminRequestDto {
+  status?: string;
+  notes?: string;
+}
+
+export interface MyRequest {
+  id: number;
+  requestType: CreateRequestDto['requestType'];
+  bookName: string | null;
+  details: string;
+  status: string;
+  coordinatorNotes: string | null;
+  outputOriginalName: string | null;
+  createdAt: string;
+}
 
 export interface CreateRequestDto {
   requestType: 'PDF_TO_WORD' | 'PDF_TO_AUDIO' | 'ACCOMPANIMENT';
@@ -26,7 +64,9 @@ export const requestsApi = {
   },
 
   getMyRequests: (params: { page?: number; limit?: number } = {}) =>
-    apiClient.get('/requests/my', { params }).then((r) => r.data),
+    apiClient
+      .get<PaginatedResponse<MyRequest>>('/requests/my', { params })
+      .then((r) => r.data),
 
   downloadOutputFile: async (requestId: number, originalName: string) => {
     const response = await apiClient.get<Blob>(`/requests/${requestId}/output`, {
@@ -43,7 +83,7 @@ export const requestsApi = {
   },
 
   getStats: () =>
-    apiClient.get('/stats').then((r) => r.data),
+    apiClient.get<DashboardStats>('/stats').then((r) => r.data),
 
   // Admin
   getRequests: (
@@ -54,8 +94,10 @@ export const requestsApi = {
       search?: string;
     } = {},
   ) =>
-    apiClient.get('/admin/requests', { params }).then((r) => r.data),
+    apiClient
+      .get<PaginatedResponse<AdminRequest>>('/admin/requests', { params })
+      .then((r) => r.data),
 
-  updateRequest: (id: number, dto: { status?: string; notes?: string }) =>
-    apiClient.patch(`/admin/requests/${id}`, dto).then((r) => r.data),
+  updateRequest: (id: number, dto: UpdateAdminRequestDto) =>
+    apiClient.patch<AdminRequest>(`/admin/requests/${id}`, dto).then((r) => r.data),
 };

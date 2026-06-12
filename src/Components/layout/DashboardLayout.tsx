@@ -1,48 +1,12 @@
 import { useState } from 'react';
-import type { LucideIcon } from 'lucide-react';
 import { LogOut, Menu, X } from 'lucide-react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import { useAuth } from '../../Hooks/auth/UseAuth';
-
-export type DashboardNavItem = {
-  to: string;
-  label: string;
-  icon: LucideIcon;
-  end?: boolean;
-};
-
-type DashboardTheme = {
-  sidebar: string;
-  border: string;
-  activeLink: string;
-  inactiveLink: string;
-  userName: string;
-  userEmail: string;
-  logout: string;
-  menuFocusRing: string;
-};
-
-type DashboardLayoutProps = {
-  portalTitle: string;
-  navLabel: string;
-  navItems: DashboardNavItem[];
-  theme: DashboardTheme;
-  showUserEmail?: boolean;
-  mainId?: string;
-};
-
-type DashboardSidebarProps = {
-  portalTitle: string;
-  navLabel: string;
-  navItems: DashboardNavItem[];
-  theme: DashboardTheme;
-  userName?: string;
-  userEmail?: string;
-  showUserEmail: boolean;
-  onNavigate: () => void;
-  onLogout: () => Promise<void>;
-};
+import type {
+  DashboardLayoutProps,
+  DashboardSidebarProps,
+} from '../../Types/dashboard.types';
 
 function DashboardSidebar({
   portalTitle,

@@ -1,49 +1,17 @@
 import { useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { BookOpen, FileText, Headphones, File, Download } from 'lucide-react';
-import { libraryApi, type LibraryItem } from '../../api/library';
+import { Download } from 'lucide-react';
+import { libraryApi } from '../../api/library';
 import { InfiniteScrollTrigger } from '../../Components/InfiniteScrollTrigger';
 import { useDebouncedValue } from '../../Hooks/useDebouncedValue';
-
-const typeIcon: Record<LibraryItem['itemType'], React.ElementType> = {
-  AUDIO: Headphones,
-  WORD_DOC: FileText,
-  PDF: FileText,
-  BRAILLE: BookOpen,
-  OTHER: File,
-};
-
-const typeLabel: Record<LibraryItem['itemType'], string> = {
-  AUDIO: 'تسجيل صوتي',
-  WORD_DOC: 'ملف Word',
-  PDF: 'PDF',
-  BRAILLE: 'برايل',
-  OTHER: 'أخرى',
-};
-
-const typeColor: Record<LibraryItem['itemType'], string> = {
-  AUDIO: 'bg-teal-100 text-teal-600',
-  WORD_DOC: 'bg-blue-100 text-blue-600',
-  PDF: 'bg-red-100 text-red-600',
-  BRAILLE: 'bg-purple-100 text-purple-600',
-  OTHER: 'bg-gray-100 text-gray-600',
-};
+import { useLibraryInfiniteQuery } from '../../Hooks/library/queries/useLibraryInfiniteQuery';
+import { LIBRARY_ITEM_TYPE_META } from '../../constants/library.constants';
 
 export default function VILibrary() {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 500);
 
-  const booksQuery = useInfiniteQuery({
-    queryKey: ['vi-library-items', debouncedSearch],
-    queryFn: ({ pageParam }) =>
-      libraryApi.getAll({
-        search: debouncedSearch || undefined,
-        page: pageParam,
-        limit: 10,
-      }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasMore ? lastPage.page + 1 : undefined,
+  const booksQuery = useLibraryInfiniteQuery('vi-library-items', {
+    search: debouncedSearch || undefined,
   });
 
   const books = booksQuery.data?.pages.flatMap((page) => page.data) ?? [];
@@ -84,7 +52,8 @@ export default function VILibrary() {
       {books.length > 0 && (
         <ul className="space-y-3" role="list">
           {books.map((book) => {
-            const Icon = typeIcon[book.itemType] ?? File;
+            const itemType = LIBRARY_ITEM_TYPE_META[book.itemType];
+            const Icon = itemType.icon;
             return (
               <li
                 key={book.id}
@@ -92,14 +61,14 @@ export default function VILibrary() {
               >
                 <div className="flex items-start gap-3">
                   <div
-                    className={`mt-0.5 shrink-0 rounded-lg p-2 ${typeColor[book.itemType] ?? 'bg-gray-100 text-gray-600'}`}
+                    className={`mt-0.5 shrink-0 rounded-lg p-2 ${itemType.color}`}
                   >
                     <Icon size={18} aria-hidden="true" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-gray-900">{book.title}</p>
                     <p className="text-xs text-gray-500 mt-0.5">
-                      {typeLabel[book.itemType]}
+                      {itemType.label}
                     </p>
                   </div>
                 </div>
