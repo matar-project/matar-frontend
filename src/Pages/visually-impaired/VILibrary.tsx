@@ -127,16 +127,14 @@ export default function VILibrary() {
                   </dl>
                 )}
 
-                <a
-                  href={book.fileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download={book.fileName}
+                <button
+                  type="button"
+                  onClick={() => void libraryApi.download(book)}
                   className="inline-flex items-center gap-1.5 rounded-lg bg-teal-50 px-3 py-1.5 text-xs font-medium text-teal-700 hover:bg-teal-100 transition-colors"
                 >
                   <Download size={13} aria-hidden="true" />
                   تنزيل الملف
-                </a>
+                </button>
               </li>
             );
           })}

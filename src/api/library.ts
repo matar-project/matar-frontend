@@ -23,6 +23,7 @@ export interface LibraryItem {
   fileUrl: string;
   fileName: string;
   fileSize: number | null;
+  sourceRequestId: number | null;
   published: boolean;
   createdAt: string;
   updatedAt: string;
@@ -44,6 +45,29 @@ export interface SystemBook {
 export type SystemBooksResponse = PaginatedResponse<SystemBook>;
 
 export const libraryApi = {
+  download: async (
+    item: Pick<
+      LibraryItem,
+      'id' | 'fileName' | 'fileUrl' | 'sourceRequestId'
+    >,
+  ) => {
+    if (!item.sourceRequestId) {
+      window.open(item.fileUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    const response = await apiClient.get<Blob>(
+      `/library/${item.id}/download`,
+      { responseType: 'blob' },
+    );
+    const url = URL.createObjectURL(response.data);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = item.fileName;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  },
   getSystemBooks: (filters: Pick<LibraryFilters, 'search' | 'page' | 'limit'> = {}) =>
     apiClient
       .get<SystemBooksResponse>('/library/books', { params: filters })

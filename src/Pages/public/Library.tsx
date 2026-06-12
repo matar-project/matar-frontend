@@ -121,17 +121,15 @@ export default function Library() {
                       <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">{item.description}</p>
                     )}
                     <div className="mt-auto pt-2">
-                      <a
-                        href={item.fileUrl}
-                        download={item.fileName}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        type="button"
+                        onClick={() => void libraryApi.download(item)}
                         className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 transition-colors"
                         aria-label={`تحميل ${item.title}`}
                       >
                         <Download size={16} aria-hidden="true" />
                         تحميل
-                      </a>
+                      </button>
                     </div>
                   </article>
                 </li>

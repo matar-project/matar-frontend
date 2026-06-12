@@ -7,6 +7,11 @@ export type CoordinatorRequestStatus =
   | 'COORDINATOR_ACCEPTED'
   | 'COORDINATOR_REJECTED'
   | 'DONE';
+export type CoordinatorRequestFilter =
+  | CoordinatorRequestStatus
+  | 'ALL'
+  | 'IN_PROGRESS'
+  | 'AWAITING_COMPLETION_APPROVAL';
 export type ReservationStatus = 'IN_PROGRESS' | 'DONE' | 'REJECTED' | 'LATE';
 
 export interface WorkflowRequest {
@@ -85,6 +90,7 @@ export interface Reservation {
   effectiveStatus: ReservationStatus;
   deadlineAt: string;
   completedAt: string | null;
+  outputOriginalName: string | null;
   rejectedAt: string | null;
   rejectionReason: string | null;
   createdAt: string;
@@ -113,6 +119,20 @@ export interface CoordinatorStats {
   lateReservations: number;
 }
 
+export interface VolunteerDashboardStats {
+  available: number;
+  inProgress: number;
+  completed: number;
+  recentAvailable: Array<{
+    id: number;
+    title: string;
+    requestType: RequestType;
+    details: string;
+    totalPages: number | null;
+    nextAvailablePage: number | null;
+  }>;
+}
+
 export interface AccompanimentAssignment {
   id: number;
   status: Exclude<ReservationStatus, 'LATE'>;
@@ -127,6 +147,10 @@ export interface AccompanimentAssignment {
 }
 
 export const workflowApi = {
+  getVolunteerDashboard: () =>
+    apiClient
+      .get<VolunteerDashboardStats>('/volunteer/dashboard')
+      .then((response) => response.data),
   uploadOutputFile: (requestId: number, file: File) => {
     const formData = new FormData();
     formData.append('outputFile', file);
@@ -165,7 +189,7 @@ export const workflowApi = {
     URL.revokeObjectURL(url);
   },
   getCoordinatorRequests: (
-    params: ListParams & { status?: CoordinatorRequestStatus } = {},
+    params: ListParams & { status?: CoordinatorRequestFilter } = {},
   ) =>
     apiClient
       .get<PaginatedResponse<WorkflowRequest>>('/coordinator/requests', {
@@ -248,6 +272,17 @@ export const workflowApi = {
     apiClient
       .patch<Reservation>(`/volunteer/reservations/${id}/done`)
       .then((response) => response.data),
+  completeWordReservation: (id: number, file: File) => {
+    const formData = new FormData();
+    formData.append('outputFile', file);
+    return apiClient
+      .post<Reservation>(
+        `/volunteer/reservations/${id}/word-output`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
+      )
+      .then((response) => response.data);
+  },
   rejectReservation: (id: number, reason?: string) =>
     apiClient
       .patch<Reservation>(`/volunteer/reservations/${id}/reject`, { reason })

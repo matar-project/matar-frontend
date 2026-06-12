@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   useInfiniteQuery,
   useMutation,
@@ -12,6 +12,7 @@ import {
   Download,
   FileText,
   Phone,
+  Upload,
 } from 'lucide-react';
 import {
   workflowApi,
@@ -114,10 +115,16 @@ function ReservationRow({
   reservation,
   onUpdate,
   updating,
+  updateError,
 }: {
   reservation: Reservation;
-  onUpdate: (action: 'done' | 'reject', reason?: string) => void;
+  onUpdate: (
+    action: 'done' | 'reject',
+    reason?: string,
+    file?: File,
+  ) => void;
   updating: boolean;
+  updateError: boolean;
 }) {
   const [expanded, setExpanded] = useState(
     reservation.status === 'IN_PROGRESS',
@@ -126,6 +133,7 @@ function ReservationRow({
     reservation.request.bookName ??
     reservation.request.title ??
     'طلب تحويل كتاب';
+  const wordFileRef = useRef<HTMLInputElement>(null);
 
   return (
     <article className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -219,16 +227,51 @@ function ReservationRow({
               )}
               {reservation.status === 'IN_PROGRESS' && (
                 <>
-                  <Button
-                    size="sm"
-                    className="w-full"
-                    disabled={reservation.effectiveStatus === 'LATE'}
-                    loading={updating}
-                    onClick={() => onUpdate('done')}
-                  >
-                    <FileText size={15} aria-hidden="true" />
-                    تم إكمال الصفحات
-                  </Button>
+                  {reservation.request.requestType === 'PDF_TO_WORD' ? (
+                    <>
+                      <input
+                        ref={wordFileRef}
+                        type="file"
+                        accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        className="hidden"
+                        onChange={(event) => {
+                          const file = event.target.files?.[0];
+                          if (file) onUpdate('done', undefined, file);
+                          event.target.value = '';
+                        }}
+                      />
+                      <Button
+                        size="sm"
+                        className="w-full"
+                        disabled={reservation.effectiveStatus === 'LATE'}
+                        loading={updating}
+                        onClick={() => wordFileRef.current?.click()}
+                      >
+                        <Upload size={15} aria-hidden="true" />
+                        رفع ملف Word وإكمال الصفحات
+                      </Button>
+                      <p className="rounded-lg bg-blue-50 p-3 text-xs leading-6 text-blue-700">
+                        لن تُعتبر الصفحات مكتملة قبل رفع ملف Word بصيغة
+                        .docx.
+                      </p>
+                    </>
+                  ) : (
+                    <Button
+                      size="sm"
+                      className="w-full"
+                      disabled={reservation.effectiveStatus === 'LATE'}
+                      loading={updating}
+                      onClick={() => onUpdate('done')}
+                    >
+                      <FileText size={15} aria-hidden="true" />
+                      تم إكمال الصفحات
+                    </Button>
+                  )}
+                  {updateError && (
+                    <p className="rounded-lg bg-red-50 p-3 text-xs text-red-700">
+                      تعذر إكمال المهمة. تأكد من اختيار ملف .docx صالح.
+                    </p>
+                  )}
                   <Button
                     size="sm"
                     variant="danger"
@@ -295,13 +338,17 @@ export default function VolunteerWorkRequests() {
       id,
       action,
       reason,
+      file,
     }: {
       id: number;
       action: 'done' | 'reject';
       reason?: string;
+      file?: File;
     }) =>
       action === 'done'
-        ? workflowApi.markReservationDone(id)
+        ? file
+          ? workflowApi.completeWordReservation(id, file)
+          : workflowApi.markReservationDone(id)
         : workflowApi.rejectReservation(id, reason),
     onSuccess: () => {
       void queryClient.invalidateQueries({
@@ -364,11 +411,16 @@ export default function VolunteerWorkRequests() {
               updateReservation.isPending &&
               updateReservation.variables?.id === reservation.id
             }
-            onUpdate={(action, reason) =>
+            updateError={
+              updateReservation.isError &&
+              updateReservation.variables?.id === reservation.id
+            }
+            onUpdate={(action, reason, file) =>
               updateReservation.mutate({
                 id: reservation.id,
                 action,
                 reason,
+                file,
               })
             }
           />
