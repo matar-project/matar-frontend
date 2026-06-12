@@ -45,7 +45,7 @@ function RequestRow({
       </p>
       <div className="flex items-center justify-between text-xs text-gray-400">
         <span>
-          {new Date(request.createdAt).toLocaleDateString('ar-JO')}
+          {new Date(request.createdAt).toLocaleDateString('ar-JO-u-nu-latn')}
         </span>
         <Button
           size="sm"

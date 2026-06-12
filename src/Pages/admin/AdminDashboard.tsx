@@ -45,7 +45,7 @@ export default function AdminDashboard() {
               <li key={r.id} className="py-3 flex items-center justify-between gap-2">
                 <div>
                   <p className="text-sm font-medium text-gray-800">{r.fullName}</p>
-                  <p className="text-xs text-gray-500">{r.city} · {new Date(r.createdAt).toLocaleDateString('ar-JO')}</p>
+                  <p className="text-xs text-gray-500">{r.city} · {new Date(r.createdAt).toLocaleDateString('ar-JO-u-nu-latn')}</p>
                 </div>
                 <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                   r.status === 'NEW' ? 'bg-blue-100 text-blue-700' :

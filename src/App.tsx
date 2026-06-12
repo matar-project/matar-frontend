@@ -89,6 +89,7 @@ function App() {
         <Route element={<CoordinatorLayout />}>
           <Route path="/coordinator" element={<CoordinatorDashboard />} />
           <Route path="/coordinator/requests" element={<CoordinatorRequests />} />
+          <Route path="/coordinator/library" element={<VILibrary />} />
           <Route
             path="/coordinator/reservations"
             element={<CoordinatorReservations />}

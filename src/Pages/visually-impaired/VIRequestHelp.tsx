@@ -188,11 +188,14 @@ export default function VIRequestHelp() {
               )}
               <div className="flex items-center justify-between gap-3 pt-1">
                 <p className="text-xs text-gray-400">
-                  {new Date(req.createdAt).toLocaleDateString('ar-JO', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
+                  {new Date(req.createdAt).toLocaleDateString(
+                    'ar-JO-u-nu-latn',
+                    {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    },
+                  )}
                 </p>
                 {req.status === 'DONE' && (
                   req.outputOriginalName ? (

@@ -1,10 +1,11 @@
-import { ClipboardList, Clock3, LayoutDashboard } from 'lucide-react';
+import { ClipboardList, Clock3, LayoutDashboard, Library } from 'lucide-react';
 import { DashboardLayout } from './DashboardLayout';
 
 const navItems = [
   { to: '/coordinator', label: 'الرئيسية', icon: LayoutDashboard, end: true },
   { to: '/coordinator/requests', label: 'الطلبات', icon: ClipboardList },
   { to: '/coordinator/reservations', label: 'حجوزات الصفحات', icon: Clock3 },
+  { to: '/coordinator/library', label: 'المكتبة الصوتية', icon: Library },
 ];
 
 export function CoordinatorLayout() {

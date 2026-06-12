@@ -80,7 +80,9 @@ export default function AdminVolunteers() {
                   </p>
                   <p className="mt-1 text-xs text-gray-400">
                     انضم في{' '}
-                    {new Date(volunteer.createdAt).toLocaleDateString('ar-JO')}
+                    {new Date(volunteer.createdAt).toLocaleDateString(
+                      'ar-JO-u-nu-latn',
+                    )}
                   </p>
                 </div>
                 <div className="space-y-2 text-sm text-gray-600">
