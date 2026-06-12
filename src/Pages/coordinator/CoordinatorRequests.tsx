@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef } from "react";
 import {
   useInfiniteQuery,
   useMutation,
   useQueryClient,
-} from '@tanstack/react-query';
+} from "@tanstack/react-query";
 import {
   BookOpen,
   ChevronDown,
@@ -12,68 +12,70 @@ import {
   Pencil,
   Phone,
   UserRound,
-} from 'lucide-react';
+} from "lucide-react";
 import {
   workflowApi,
-  type CoordinatorRequestStatus,
+  type CoordinatorRequestFilter,
   type WorkflowRequest,
-} from '../../api/workflow';
-import { Button } from '../../Components/ui/Button';
+} from "../../api/workflow";
+import { Button } from "../../Components/ui/Button";
 import {
   InputField,
   SelectField,
   TextareaField,
-} from '../../Components/ui/FormField';
-import { StatusBadge } from '../../Components/ui/StatusBadge';
-import { useDebouncedValue } from '../../Hooks/useDebouncedValue';
-import { InfiniteScrollTrigger } from '../../Components/InfiniteScrollTrigger';
+} from "../../Components/ui/FormField";
+import { StatusBadge } from "../../Components/ui/StatusBadge";
+import { useDebouncedValue } from "../../Hooks/useDebouncedValue";
+import { InfiniteScrollTrigger } from "../../Components/InfiniteScrollTrigger";
 
 const typeLabels = {
-  PDF_TO_WORD: 'PDF إلى Word',
-  PDF_TO_AUDIO: 'PDF إلى تسجيل صوتي',
-  ACCOMPANIMENT: 'طلب مرافقة',
+  PDF_TO_WORD: "PDF إلى Word",
+  PDF_TO_AUDIO: "PDF إلى تسجيل صوتي",
+  ACCOMPANIMENT: "طلب مرافقة",
 };
 
 function RequestCard({ request }: { request: WorkflowRequest }) {
   const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState(
-    request.status === 'PENDING_COORDINATOR',
+    request.status === "PENDING_COORDINATOR",
   );
-  const [notes, setNotes] = useState(request.coordinatorNotes ?? '');
+  const [notes, setNotes] = useState(request.coordinatorNotes ?? "");
   const [showReject, setShowReject] = useState(false);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
-    bookName: request.bookName ?? '',
+    bookName: request.bookName ?? "",
     details: request.details,
-    totalPages: request.totalPages?.toString() ?? '',
+    totalPages: request.totalPages?.toString() ?? "",
   });
 
-  const pending = request.status === 'PENDING_COORDINATOR';
+  const pending = request.status === "PENDING_COORDINATOR";
   const conversion =
-    request.requestType === 'PDF_TO_WORD' ||
-    request.requestType === 'PDF_TO_AUDIO';
+    request.requestType === "PDF_TO_WORD" ||
+    request.requestType === "PDF_TO_AUDIO";
   const requester = request.createdByUser;
   const progress = request.conversionProgress;
+  const displayStatus =
+    request.status === "COORDINATOR_ACCEPTED" && progress?.canApproveCompletion
+      ? "AWAITING_COMPLETION_APPROVAL"
+      : request.status;
   const displayName =
     request.bookName ??
     request.title ??
-    (request.requestType === 'ACCOMPANIMENT'
-      ? 'طلب مرافقة'
-      : 'طلب تحويل كتاب');
+    (request.requestType === "ACCOMPANIMENT" ? "طلب مرافقة" : "طلب تحويل كتاب");
   const formValid =
     form.details.trim().length >= 10 &&
     (!conversion ||
       (form.bookName.trim().length > 0 && Number(form.totalPages) > 0));
 
   const refresh = () => {
-    void queryClient.invalidateQueries({ queryKey: ['coordinator-requests'] });
-    void queryClient.invalidateQueries({ queryKey: ['coordinator-stats'] });
-    void queryClient.invalidateQueries({ queryKey: ['system-library-books'] });
+    void queryClient.invalidateQueries({ queryKey: ["coordinator-requests"] });
+    void queryClient.invalidateQueries({ queryKey: ["coordinator-stats"] });
+    void queryClient.invalidateQueries({ queryKey: ["system-library-books"] });
   };
 
   const review = useMutation({
-    mutationFn: (action: 'accept' | 'reject') =>
-      action === 'accept'
+    mutationFn: (action: "accept" | "reject") =>
+      action === "accept"
         ? workflowApi.acceptRequest(request.id, notes || undefined)
         : workflowApi.rejectRequest(request.id, notes),
     onSuccess: refresh,
@@ -114,7 +116,7 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-lg font-bold text-gray-900">{displayName}</h3>
-            <StatusBadge status={request.status} />
+            <StatusBadge status={displayStatus} />
             <span className="rounded-full bg-cyan-50 px-2.5 py-0.5 text-xs font-medium text-cyan-700">
               {typeLabels[request.requestType]}
             </span>
@@ -131,7 +133,7 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
             {conversion && (
               <span className="inline-flex items-center gap-1.5">
                 <BookOpen size={16} aria-hidden="true" />
-                {request.totalPages ?? '-'} صفحة
+                {request.totalPages ?? "-"} صفحة
               </span>
             )}
           </div>
@@ -149,7 +151,9 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
         <div className="border-t border-gray-100 p-5">
           {editing ? (
             <div className="space-y-4 rounded-xl border border-blue-100 bg-blue-50/40 p-4">
-              <h4 className="font-semibold text-gray-900">تعديل بيانات الطلب</h4>
+              <h4 className="font-semibold text-gray-900">
+                تعديل بيانات الطلب
+              </h4>
               {conversion && (
                 <div className="grid gap-4 sm:grid-cols-2">
                   <InputField
@@ -229,7 +233,7 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
                       {request.volunteerAssignment.volunteer.name}
                       {request.volunteerAssignment.volunteer.phone && (
                         <>
-                          {' - '}
+                          {" - "}
                           <bdi dir="ltr">
                             {request.volunteerAssignment.volunteer.phone}
                           </bdi>
@@ -244,23 +248,23 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
                     <h4 className="font-semibold">حالة الكتاب في النظام</h4>
                     <div className="mt-2 flex flex-wrap gap-2">
                       <span className="rounded-full bg-white px-3 py-1">
-                        Word:{' '}
+                        Word:{" "}
                         {request.conversionBook.wordCompleted
-                          ? 'مكتمل'
-                          : 'غير مكتمل'}
+                          ? "مكتمل"
+                          : "غير مكتمل"}
                       </span>
                       <span className="rounded-full bg-white px-3 py-1">
-                        صوتي:{' '}
+                        صوتي:{" "}
                         {request.conversionBook.audioCompleted
-                          ? 'مكتمل'
-                          : 'غير مكتمل'}
+                          ? "مكتمل"
+                          : "غير مكتمل"}
                       </span>
                     </div>
                   </section>
                 )}
 
                 {conversion &&
-                  request.status === 'COORDINATOR_ACCEPTED' &&
+                  request.status === "COORDINATOR_ACCEPTED" &&
                   progress && (
                     <section className="space-y-3 rounded-lg border border-cyan-100 p-4 text-sm">
                       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -268,7 +272,7 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
                           تقدم التحويل
                         </h4>
                         <span className="font-medium text-cyan-700">
-                          {progress.completedThroughPage} من{' '}
+                          {progress.completedThroughPage} من{" "}
                           {progress.totalPages ?? 0} صفحة
                         </span>
                       </div>
@@ -287,6 +291,55 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
                           }}
                         />
                       </div>
+                      {request.outputOriginalName && (
+                        <>
+                          <p className="truncate text-xs text-gray-500">
+                            الملف النهائي: {request.outputOriginalName}
+                          </p>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="w-full bg-white"
+                            onClick={() =>
+                              void workflowApi.downloadOutputFile(
+                                request.id,
+                                request.outputOriginalName!,
+                              )
+                            }
+                          >
+                            <Download size={15} aria-hidden="true" />
+                            تنزيل الملف المجمّع للمراجعة
+                          </Button>
+                          <input
+                            ref={outputFileRef}
+                            type="file"
+                            accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                            className="hidden"
+                            onChange={(event) => {
+                              const file = event.target.files?.[0];
+                              if (file) uploadOutput.mutate(file);
+                              event.target.value = "";
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="w-full bg-white"
+                            loading={uploadOutput.isPending}
+                            disabled={!progress.canApproveCompletion}
+                            onClick={() => outputFileRef.current?.click()}
+                          >
+                            استبدال الملف النهائي المصحح
+                          </Button>
+                          {uploadOutput.isError && (
+                            <p className="text-xs text-red-600">
+                              تعذر استبدال الملف. اختر ملف .docx صالحاً.
+                            </p>
+                          )}
+                        </>
+                      )}
                       <Button
                         size="sm"
                         disabled={!progress.canApproveCompletion}
@@ -297,8 +350,8 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
                       </Button>
                       {!progress.canApproveCompletion && (
                         <p className="text-xs text-gray-500">
-                          يتاح الاعتماد بعد إكمال جميع الصفحات وعدم وجود حجز قيد
-                          التنفيذ.
+                          يتاح الاعتماد بعد إكمال جميع الصفحات، ورفع الملفات
+                          المطلوبة، وعدم وجود حجز قيد التنفيذ.
                         </p>
                       )}
                     </section>
@@ -319,7 +372,7 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
                       rows={3}
                       className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
                       placeholder={
-                        showReject ? 'سبب الرفض مطلوب' : 'ملاحظات اختيارية'
+                        showReject ? "سبب الرفض مطلوب" : "ملاحظات اختيارية"
                       }
                     />
                     {review.isError && (
@@ -329,7 +382,7 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
                       <Button
                         size="sm"
                         loading={review.isPending}
-                        onClick={() => review.mutate('accept')}
+                        onClick={() => review.mutate("accept")}
                       >
                         قبول الطلب
                       </Button>
@@ -347,7 +400,7 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
                           variant="danger"
                           disabled={!notes.trim()}
                           loading={review.isPending}
-                          onClick={() => review.mutate('reject')}
+                          onClick={() => review.mutate("reject")}
                         >
                           تأكيد الرفض
                         </Button>
@@ -358,7 +411,7 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
 
                 {!pending && request.coordinatorNotes && (
                   <p className="rounded-lg bg-amber-50 p-4 text-sm text-amber-900">
-                    <span className="font-semibold">ملاحظات المنسق:</span>{' '}
+                    <span className="font-semibold">ملاحظات المنسق:</span>{" "}
                     {request.coordinatorNotes}
                   </p>
                 )}
@@ -381,14 +434,14 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
                   <div>
                     <dt className="text-gray-500">البريد الإلكتروني</dt>
                     <dd className="mt-0.5 break-all">
-                      {requester?.email ?? request.email ?? '-'}
+                      {requester?.email ?? request.email ?? "-"}
                     </dd>
                   </div>
                   {conversion && (
                     <div>
                       <dt className="text-gray-500">عدد الصفحات</dt>
                       <dd className="mt-0.5 font-medium">
-                        {request.totalPages ?? '-'}
+                        {request.totalPages ?? "-"}
                       </dd>
                     </div>
                   )}
@@ -421,7 +474,7 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
                       تنزيل ملف PDF
                     </Button>
                   )}
-                  {request.status === 'DONE' && (
+                  {request.status === "DONE" && (
                     <div className="space-y-1.5 rounded-lg border border-dashed border-gray-300 p-3">
                       <p className="text-xs font-medium text-gray-700">
                         الملف المحوّل
@@ -437,12 +490,16 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
                       <input
                         ref={outputFileRef}
                         type="file"
-                        accept=".docx,.doc,.mp3,.wav,.ogg,.aac,.m4a"
+                        accept={
+                          request.requestType === "PDF_TO_WORD"
+                            ? ".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                            : ".mp3,.wav,.ogg,.aac,.m4a"
+                        }
                         className="hidden"
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) uploadOutput.mutate(file);
-                          e.target.value = '';
+                          e.target.value = "";
                         }}
                       />
                       <Button
@@ -453,7 +510,9 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
                         loading={uploadOutput.isPending}
                         onClick={() => outputFileRef.current?.click()}
                       >
-                        {request.outputOriginalName ? 'استبدال الملف' : 'رفع الملف المحوّل'}
+                        {request.outputOriginalName
+                          ? "استبدال الملف"
+                          : "رفع الملف المحوّل"}
                       </Button>
                     </div>
                   )}
@@ -468,28 +527,23 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
 }
 
 export default function CoordinatorRequests() {
-  const [status, setStatus] = useState<CoordinatorRequestStatus | ''>('');
-  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState<CoordinatorRequestFilter>("ALL");
+  const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 500);
-  const {
-    data,
-    isLoading,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ['coordinator-requests', status, debouncedSearch],
-    initialPageParam: 1,
-    queryFn: ({ pageParam }) =>
-      workflowApi.getCoordinatorRequests({
-        status: status || undefined,
-        page: pageParam,
-        limit: 10,
-        search: debouncedSearch || undefined,
-      }),
-    getNextPageParam: (lastPage) =>
-      lastPage.hasMore ? lastPage.page + 1 : undefined,
-  });
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["coordinator-requests", status, debouncedSearch],
+      initialPageParam: 1,
+      queryFn: ({ pageParam }) =>
+        workflowApi.getCoordinatorRequests({
+          status,
+          page: pageParam,
+          limit: 10,
+          search: debouncedSearch || undefined,
+        }),
+      getNextPageParam: (lastPage) =>
+        lastPage.hasMore ? lastPage.page + 1 : undefined,
+    });
   const requests = data?.pages.flatMap((result) => result.data) ?? [];
 
   return (
@@ -501,15 +555,15 @@ export default function CoordinatorRequests() {
             اضغط على أي طلب لعرض التفاصيل والإجراءات.
           </p>
         </div>
-        <div className="flex flex-wrap items-end gap-3">
-          <label className="space-y-1 text-sm">
+        <div className="grid w-full grid-cols-1 items-end gap-3 sm:grid-cols-2 lg:w-[42rem]">
+          <label className="min-w-0 space-y-1 text-sm">
             <span className="block font-medium text-gray-700">بحث</span>
             <input
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="الكتاب، المستفيد، الهاتف، التفاصيل..."
-              className="min-h-12 min-w-72 rounded-lg border border-gray-300 px-4"
+              className="min-h-12 w-full rounded-lg border border-gray-300 px-4"
             />
           </label>
           <SelectField
@@ -517,15 +571,21 @@ export default function CoordinatorRequests() {
             label="الحالة"
             value={status}
             onChange={(event) =>
-              setStatus(event.target.value as CoordinatorRequestStatus | '')
+              setStatus(event.target.value as CoordinatorRequestFilter)
             }
-            className="min-w-56"
+            containerClassName="min-w-0"
+            className="min-h-10 min-w-0 w-full px-3 py-2 text-sm [&>option]:text-sm"
           >
-            <option value="">الكل</option>
-            <option value="PENDING_COORDINATOR">بانتظار المنسق</option>
-            <option value="COORDINATOR_ACCEPTED">مقبول</option>
+            <option value="ALL">الكل</option>
             <option value="COORDINATOR_REJECTED">مرفوض</option>
+            <option value="IN_PROGRESS">قيد التنفيذ</option>
             <option value="DONE">مكتمل</option>
+            <option value="PENDING_COORDINATOR">
+              بانتظار المنسق للموافقة على الطلب
+            </option>
+            <option value="AWAITING_COMPLETION_APPROVAL">
+              بانتظار المنسق لاعتماد التحويل
+            </option>
           </SelectField>
         </div>
       </div>

@@ -198,7 +198,7 @@ function ServiceRequestRow({
   error?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const [multiplier, setMultiplier] = useState(1);
+  const [pageCount, setPageCount] = useState('');
 
   const startPage = request.nextAvailablePage ?? 1;
   const totalPages = request.totalPages ?? 0;
@@ -206,26 +206,24 @@ function ServiceRequestRow({
   const allPagesReserved = startPage > totalPages && totalPages > 0;
   const minPages = MIN_PAGES[request.requestType] ?? 3;
 
-  // Build multiplier options: 1×, 2×, 3×... capped by remaining pages
-  const multiplierOptions: Array<{ n: number; pages: number }> = [];
+  const pageCountOptions: number[] = [];
   for (let n = 1; n <= 8; n++) {
     const pages = n * minPages;
     if (pages > remaining) break;
-    multiplierOptions.push({ n, pages });
+    pageCountOptions.push(pages);
   }
-  // If no full multiple fits but pages remain, offer all remaining
-  if (multiplierOptions.length === 0 && remaining > 0) {
-    multiplierOptions.push({ n: 1, pages: remaining });
+  if (remaining > 0 && !pageCountOptions.includes(remaining)) {
+    pageCountOptions.push(remaining);
   }
 
-  // Clamp selected multiplier to a valid option
-  const activeN =
-    multiplierOptions.some((o) => o.n === multiplier)
-      ? multiplier
-      : (multiplierOptions[0]?.n ?? 1);
-  const activeOption = multiplierOptions.find((o) => o.n === activeN);
-  const computedEndPage = activeOption
-    ? Math.min(startPage + activeOption.pages - 1, totalPages)
+  const selectedPageCount =
+    pageCount === '' ? (pageCountOptions[0] ?? 0) : Number(pageCount);
+  const validPageCount =
+    Number.isInteger(selectedPageCount) &&
+    selectedPageCount >= 1 &&
+    selectedPageCount <= remaining;
+  const computedEndPage = validPageCount
+    ? startPage + selectedPageCount - 1
     : 0;
 
   const displayName =
@@ -335,13 +333,13 @@ function ServiceRequestRow({
                       اختر حجم المهمة
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {multiplierOptions.map(({ n, pages }) => (
+                      {pageCountOptions.map((pages) => (
                         <button
-                          key={n}
+                          key={pages}
                           type="button"
-                          onClick={() => setMultiplier(n)}
+                          onClick={() => setPageCount(String(pages))}
                           className={`rounded-lg border px-3 py-1.5 text-sm transition-colors ${
-                            activeN === n
+                            selectedPageCount === pages
                               ? "border-primary-600 bg-primary-50 font-medium text-primary-700"
                               : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
                           }`}
@@ -352,7 +350,32 @@ function ServiceRequestRow({
                     </div>
                   </div>
 
-                  {activeOption && (
+                  <div>
+                    <label
+                      htmlFor={`page-count-${request.id}`}
+                      className="mb-2 block text-sm font-medium text-gray-700"
+                    >
+                      أو اكتب عدد الصفحات
+                    </label>
+                    <input
+                      id={`page-count-${request.id}`}
+                      type="number"
+                      min={1}
+                      max={remaining}
+                      step={1}
+                      value={pageCount}
+                      onChange={(event) => setPageCount(event.target.value)}
+                      placeholder={`من 1 إلى ${remaining}`}
+                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                    {!validPageCount && pageCount !== '' && (
+                      <p className="mt-1 text-xs text-red-600">
+                        أدخل عدداً صحيحاً من 1 إلى {remaining}.
+                      </p>
+                    )}
+                  </div>
+
+                  {validPageCount && (
                     <p className="rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-700">
                       ستعمل على الصفحات من{" "}
                       <strong>{startPage}</strong> إلى{" "}
@@ -364,7 +387,7 @@ function ServiceRequestRow({
                     size="sm"
                     className="w-full"
                     loading={pending}
-                    disabled={!activeOption}
+                    disabled={!validPageCount}
                     onClick={() => onReserve(computedEndPage)}
                   >
                     حجز الصفحات
