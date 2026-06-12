@@ -1,18 +1,17 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   workflowApi,
   type WorkflowRequest,
 } from '../../api/workflow';
 import {
   BookOpen,
-  ChevronDown,
-  ChevronUp,
   FileText,
   Headphones,
   Users,
 } from 'lucide-react';
 import { StatusBadge } from '../../Components/ui/StatusBadge';
+import { ExpandableCardHeader } from '../../Components/ExpandableCardHeader';
 import { formatArabicPageRange } from '../../lib/utils';
 import { useDebouncedValue } from '../../Hooks/useDebouncedValue';
 import { Button } from '../../Components/ui/Button';
@@ -25,6 +24,7 @@ const typeLabels: Record<string, string> = {
 function deadlineLabel(deadline: string, effectiveStatus: string) {
   if (effectiveStatus === 'DONE') return 'مكتملة';
   if (effectiveStatus === 'REJECTED') return 'مرفوضة';
+  if (effectiveStatus === 'EXPIRED') return 'منتهية';
   const ms = new Date(deadline).getTime() - Date.now();
   const hours = Math.ceil(Math.abs(ms) / 3_600_000);
   return ms < 0 ? `متأخر ${hours} ساعة` : `متبقي ${hours} ساعة`;
@@ -32,6 +32,7 @@ function deadlineLabel(deadline: string, effectiveStatus: string) {
 
 function BookCard({ request }: { request: WorkflowRequest }) {
   const [expanded, setExpanded] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: reservations, isLoading: loadingReservations } = useQuery({
     queryKey: ['request-reservations', request.id],
@@ -53,14 +54,24 @@ function BookCard({ request }: { request: WorkflowRequest }) {
           ),
         )
       : 0;
+  const rejectReservation = useMutation({
+    mutationFn: ({ id, reason }: { id: number; reason?: string }) =>
+      workflowApi.rejectVolunteerReservation(id, reason),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ['request-reservations', request.id],
+      });
+      void queryClient.invalidateQueries({ queryKey: ['coordinator-books'] });
+      void queryClient.invalidateQueries({ queryKey: ['coordinator-stats'] });
+    },
+  });
 
   return (
     <article className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-      <button
-        type="button"
-        className="flex w-full items-start gap-4 p-5 text-right transition-colors hover:bg-gray-50"
-        onClick={() => setExpanded((v) => !v)}
-        aria-expanded={expanded}
+      <ExpandableCardHeader
+        expanded={expanded}
+        onToggle={() => setExpanded((current) => !current)}
+        className="gap-4"
       >
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-50">
           <TypeIcon size={20} className="text-primary-600" aria-hidden />
@@ -105,10 +116,7 @@ function BookCard({ request }: { request: WorkflowRequest }) {
           ) : null}
         </div>
 
-        <div className="shrink-0 rounded-lg bg-gray-100 p-2 text-gray-500">
-          {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-        </div>
-      </button>
+      </ExpandableCardHeader>
 
       {expanded && (
         <div className="border-t border-gray-100">
@@ -128,6 +136,7 @@ function BookCard({ request }: { request: WorkflowRequest }) {
                     <th className="whitespace-nowrap px-4 py-3">الموعد النهائي</th>
                     <th className="whitespace-nowrap px-4 py-3">الوقت</th>
                     <th className="whitespace-nowrap px-4 py-3">الحالة</th>
+                    <th className="whitespace-nowrap px-4 py-3">الإجراءات</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -149,12 +158,12 @@ function BookCard({ request }: { request: WorkflowRequest }) {
                       </td>
                       <td className="whitespace-nowrap px-4 py-3 text-gray-600">
                         {new Date(reservation.createdAt).toLocaleDateString(
-                          'ar-JO',
+                          'ar-JO-u-nu-latn',
                         )}
                       </td>
                       <td className="whitespace-nowrap px-4 py-3 text-gray-600">
                         {new Date(reservation.deadlineAt).toLocaleString(
-                          'ar-JO',
+                          'ar-JO-u-nu-latn',
                         )}
                       </td>
                       <td className="whitespace-nowrap px-4 py-3 text-gray-600">
@@ -165,6 +174,43 @@ function BookCard({ request }: { request: WorkflowRequest }) {
                       </td>
                       <td className="whitespace-nowrap px-4 py-3">
                         <StatusBadge status={reservation.effectiveStatus} />
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3">
+                        {reservation.status === 'IN_PROGRESS' ? (
+                          <Button
+                            size="sm"
+                            variant="danger"
+                            loading={
+                              rejectReservation.isPending &&
+                              rejectReservation.variables?.id === reservation.id
+                            }
+                            onClick={() => {
+                              const confirmed = window.confirm(
+                                `هل تريد إلغاء حجز ${reservation.volunteer.name} للصفحات ${reservation.startPage} - ${reservation.endPage} وإعادتها إلى الفرص المتاحة؟`,
+                              );
+                              if (!confirmed) return;
+                              const reason = window.prompt(
+                                'سبب إلغاء الحجز (اختياري)',
+                              );
+                              if (reason === null) return;
+                              rejectReservation.mutate({
+                                id: reservation.id,
+                                reason: reason.trim() || undefined,
+                              });
+                            }}
+                          >
+                            إلغاء الحجز
+                          </Button>
+                        ) : (
+                          '—'
+                        )}
+                        {rejectReservation.isError &&
+                          rejectReservation.variables?.id ===
+                            reservation.id && (
+                            <p className="mt-2 max-w-48 whitespace-normal text-xs text-red-600">
+                              تعذر إلغاء الحجز. ربما لم يعد الحجز قيد التنفيذ.
+                            </p>
+                          )}
                       </td>
                     </tr>
                   ))}

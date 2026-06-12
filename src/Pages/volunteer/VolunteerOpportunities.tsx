@@ -6,8 +6,6 @@ import {
 } from "@tanstack/react-query";
 import {
   BookOpen,
-  ChevronDown,
-  ChevronUp,
   Download,
   FileText,
   Headphones,
@@ -17,6 +15,7 @@ import { opportunitiesApi, type Opportunity } from "../../api/opportunities";
 import { workflowApi, type AvailableRequest } from "../../api/workflow";
 import { Button } from "../../Components/ui/Button";
 import { InfiniteScrollTrigger } from "../../Components/InfiniteScrollTrigger";
+import { ExpandableCardHeader } from "../../Components/ExpandableCardHeader";
 import { useDebouncedValue } from "../../Hooks/useDebouncedValue";
 import { formatArabicPageRange } from "../../lib/utils";
 
@@ -54,28 +53,23 @@ function mergePageRanges(
     );
 }
 
-function ExpandButton({
-  expanded,
-  onClick,
-}: {
-  expanded: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      className="rounded-lg bg-gray-100 p-2 text-gray-600 transition-colors hover:bg-gray-200"
-      onClick={onClick}
-      aria-expanded={expanded}
-      aria-label={expanded ? "إخفاء التفاصيل" : "عرض التفاصيل"}
-    >
-      {expanded ? (
-        <ChevronUp size={18} aria-hidden="true" />
-      ) : (
-        <ChevronDown size={18} aria-hidden="true" />
-      )}
-    </button>
-  );
+function allocatePageRanges(
+  ranges: Array<{ startPage: number; endPage: number }>,
+  pageCount: number,
+) {
+  const allocation: Array<{ startPage: number; endPage: number }> = [];
+  let pagesNeeded = pageCount;
+  for (const range of ranges) {
+    const rangePageCount = range.endPage - range.startPage + 1;
+    const allocatedPageCount = Math.min(rangePageCount, pagesNeeded);
+    allocation.push({
+      startPage: range.startPage,
+      endPage: range.startPage + allocatedPageCount - 1,
+    });
+    pagesNeeded -= allocatedPageCount;
+    if (pagesNeeded === 0) return allocation;
+  }
+  return [];
 }
 
 function OpportunityRow({
@@ -103,7 +97,10 @@ function OpportunityRow({
 
   return (
     <article className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-      <div className="flex items-start justify-between gap-4 p-5">
+      <ExpandableCardHeader
+        expanded={expanded}
+        onToggle={() => setExpanded((current) => !current)}
+      >
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-bold text-gray-900">{opportunity.title}</h3>
@@ -131,11 +128,7 @@ function OpportunityRow({
             )}
           </div>
         </div>
-        <ExpandButton
-          expanded={expanded}
-          onClick={() => setExpanded((current) => !current)}
-        />
-      </div>
+      </ExpandableCardHeader>
 
       {expanded && (
         <div className="border-t border-gray-100 p-5">
@@ -192,39 +185,45 @@ function ServiceRequestRow({
   error,
 }: {
   request: AvailableRequest;
-  onReserve: (endPage: number) => void;
+  onReserve: (pageCount: number) => void;
   onClaim: () => void;
   pending: boolean;
   error?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const [pageCount, setPageCount] = useState('');
+  const [pageCount, setPageCount] = useState("");
 
-  const startPage = request.nextAvailablePage ?? 1;
-  const totalPages = request.totalPages ?? 0;
-  const remaining = totalPages - startPage + 1;
-  const allPagesReserved = startPage > totalPages && totalPages > 0;
+  const remaining = request.totalAvailablePages;
+  const allPagesReserved = remaining <= 0;
   const minPages = MIN_PAGES[request.requestType] ?? 3;
 
   const pageCountOptions: number[] = [];
-  for (let n = 1; n <= 8; n++) {
-    const pages = n * minPages;
-    if (pages > remaining) break;
+  const maximumListedPageCount = Math.min(remaining, minPages * 8);
+  for (
+    let pages = minPages;
+    pages <= maximumListedPageCount;
+    pages += minPages
+  ) {
     pageCountOptions.push(pages);
   }
   if (remaining > 0 && !pageCountOptions.includes(remaining)) {
     pageCountOptions.push(remaining);
   }
 
-  const selectedPageCount =
-    pageCount === '' ? (pageCountOptions[0] ?? 0) : Number(pageCount);
+  const requestedPageCount = Number(pageCount);
+  const selectedPageCount = pageCountOptions.includes(requestedPageCount)
+    ? requestedPageCount
+    : (pageCountOptions[0] ?? 0);
   const validPageCount =
     Number.isInteger(selectedPageCount) &&
     selectedPageCount >= 1 &&
     selectedPageCount <= remaining;
-  const computedEndPage = validPageCount
-    ? startPage + selectedPageCount - 1
-    : 0;
+  const pagesRemainingAfterReservation = validPageCount
+    ? remaining - selectedPageCount
+    : remaining;
+  const allocatedRanges = validPageCount
+    ? allocatePageRanges(request.availableRanges, selectedPageCount)
+    : [];
 
   const displayName =
     request.bookName ??
@@ -240,7 +239,10 @@ function ServiceRequestRow({
 
   return (
     <article className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-      <div className="flex items-start justify-between gap-4 p-5">
+      <ExpandableCardHeader
+        expanded={expanded}
+        onToggle={() => setExpanded((current) => !current)}
+      >
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-bold text-gray-900">{displayName}</h3>
@@ -266,11 +268,7 @@ function ServiceRequestRow({
             )}
           </div>
         </div>
-        <ExpandButton
-          expanded={expanded}
-          onClick={() => setExpanded((current) => !current)}
-        />
-      </div>
+      </ExpandableCardHeader>
 
       {expanded && (
         <div className="border-t border-gray-100 p-5">
@@ -350,37 +348,29 @@ function ServiceRequestRow({
                     </div>
                   </div>
 
-                  <div>
-                    <label
-                      htmlFor={`page-count-${request.id}`}
-                      className="mb-2 block text-sm font-medium text-gray-700"
-                    >
-                      أو اكتب عدد الصفحات
-                    </label>
-                    <input
-                      id={`page-count-${request.id}`}
-                      type="number"
-                      min={1}
-                      max={remaining}
-                      step={1}
-                      value={pageCount}
-                      onChange={(event) => setPageCount(event.target.value)}
-                      placeholder={`من 1 إلى ${remaining}`}
-                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                    {!validPageCount && pageCount !== '' && (
-                      <p className="mt-1 text-xs text-red-600">
-                        أدخل عدداً صحيحاً من 1 إلى {remaining}.
-                      </p>
-                    )}
-                  </div>
-
                   {validPageCount && (
-                    <p className="rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-700">
-                      ستعمل على الصفحات من{" "}
-                      <strong>{startPage}</strong> إلى{" "}
-                      <strong>{computedEndPage}</strong>
-                    </p>
+                    <div className="space-y-2 rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-700">
+                      <div>
+                        <p className="font-medium">ستعمل على الصفحات:</p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {allocatedRanges.map((range) => (
+                            <span
+                              key={`${range.startPage}-${range.endPage}`}
+                              className="rounded-full bg-white px-3 py-1"
+                            >
+                              {formatArabicPageRange(
+                                range.startPage,
+                                range.endPage,
+                              )}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <p>
+                        الصفحات المتبقية بعد الحجز:{" "}
+                        <strong>{pagesRemainingAfterReservation}</strong>
+                      </p>
+                    </div>
                   )}
 
                   <Button
@@ -388,7 +378,7 @@ function ServiceRequestRow({
                     className="w-full"
                     loading={pending}
                     disabled={!validPageCount}
-                    onClick={() => onReserve(computedEndPage)}
+                    onClick={() => onReserve(selectedPageCount)}
                   >
                     حجز الصفحات
                   </Button>
@@ -467,11 +457,11 @@ export default function VolunteerOpportunities() {
   const reserve = useMutation({
     mutationFn: ({
       requestId,
-      endPage,
+      pageCount,
     }: {
       requestId: number;
-      endPage: number;
-    }) => workflowApi.reservePages(requestId, endPage),
+      pageCount: number;
+    }) => workflowApi.reservePages(requestId, pageCount),
     onSuccess: (_, variables) => {
       setRequestErrors((current) => ({
         ...current,
@@ -576,8 +566,8 @@ export default function VolunteerOpportunities() {
           <ServiceRequestRow
             key={request.id}
             request={request}
-            onReserve={(endPage) =>
-              reserve.mutate({ requestId: request.id, endPage })
+            onReserve={(pageCount) =>
+              reserve.mutate({ requestId: request.id, pageCount })
             }
             onClaim={() => claimAccompaniment.mutate(request.id)}
             pending={

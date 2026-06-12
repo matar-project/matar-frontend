@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import axios from 'axios';
 import {
   useInfiniteQuery,
   useMutation,
@@ -7,8 +8,6 @@ import {
 import {
   BookOpen,
   CalendarClock,
-  ChevronDown,
-  ChevronUp,
   Download,
   FileText,
   Phone,
@@ -22,6 +21,7 @@ import {
 import { Button } from '../../Components/ui/Button';
 import { InfiniteScrollTrigger } from '../../Components/InfiniteScrollTrigger';
 import { StatusBadge } from '../../Components/ui/StatusBadge';
+import { ExpandableCardHeader } from '../../Components/ExpandableCardHeader';
 import { useDebouncedValue } from '../../Hooks/useDebouncedValue';
 import { formatArabicPageRange } from '../../lib/utils';
 
@@ -30,30 +30,6 @@ const typeLabels = {
   PDF_TO_AUDIO: 'PDF إلى تسجيل صوتي',
   ACCOMPANIMENT: 'طلب مرافقة',
 };
-
-function ExpandButton({
-  expanded,
-  onClick,
-}: {
-  expanded: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      className="rounded-lg bg-gray-100 p-2 text-gray-600 transition-colors hover:bg-gray-200"
-      onClick={onClick}
-      aria-expanded={expanded}
-      aria-label={expanded ? 'إخفاء التفاصيل' : 'عرض التفاصيل'}
-    >
-      {expanded ? (
-        <ChevronUp size={18} aria-hidden="true" />
-      ) : (
-        <ChevronDown size={18} aria-hidden="true" />
-      )}
-    </button>
-  );
-}
 
 function AccompanimentRow({
   assignment,
@@ -64,7 +40,10 @@ function AccompanimentRow({
 
   return (
     <article className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-      <div className="flex items-start justify-between gap-4 p-5">
+      <ExpandableCardHeader
+        expanded={expanded}
+        onToggle={() => setExpanded((current) => !current)}
+      >
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-bold text-gray-900">
@@ -79,11 +58,7 @@ function AccompanimentRow({
             {assignment.request.details}
           </p>
         </div>
-        <ExpandButton
-          expanded={expanded}
-          onClick={() => setExpanded((current) => !current)}
-        />
-      </div>
+      </ExpandableCardHeader>
 
       {expanded && (
         <div className="space-y-4 border-t border-gray-100 p-5">
@@ -124,7 +99,7 @@ function ReservationRow({
     file?: File,
   ) => void;
   updating: boolean;
-  updateError: boolean;
+  updateError?: string;
 }) {
   const [expanded, setExpanded] = useState(
     reservation.status === 'IN_PROGRESS',
@@ -137,7 +112,10 @@ function ReservationRow({
 
   return (
     <article className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-      <div className="flex items-start justify-between gap-4 p-5">
+      <ExpandableCardHeader
+        expanded={expanded}
+        onToggle={() => setExpanded((current) => !current)}
+      >
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-bold text-gray-900">{bookName}</h3>
@@ -157,15 +135,13 @@ function ReservationRow({
             </span>
             <span className="inline-flex items-center gap-1.5">
               <CalendarClock size={16} aria-hidden="true" />
-              {new Date(reservation.deadlineAt).toLocaleString('ar-JO')}
+              {new Date(reservation.deadlineAt).toLocaleString(
+                'ar-JO-u-nu-latn',
+              )}
             </span>
           </div>
         </div>
-        <ExpandButton
-          expanded={expanded}
-          onClick={() => setExpanded((current) => !current)}
-        />
-      </div>
+      </ExpandableCardHeader>
 
       {expanded && (
         <div className="border-t border-gray-100 p-5">
@@ -194,7 +170,9 @@ function ReservationRow({
                 <div>
                   <dt className="text-gray-500">الموعد النهائي</dt>
                   <dd className="mt-1 font-medium text-gray-900">
-                    {new Date(reservation.deadlineAt).toLocaleString('ar-JO')}
+                    {new Date(reservation.deadlineAt).toLocaleString(
+                      'ar-JO-u-nu-latn',
+                    )}
                   </dd>
                 </div>
               </dl>
@@ -269,7 +247,7 @@ function ReservationRow({
                   )}
                   {updateError && (
                     <p className="rounded-lg bg-red-50 p-3 text-xs text-red-700">
-                      تعذر إكمال المهمة. تأكد من اختيار ملف .docx صالح.
+                      {updateError}
                     </p>
                   )}
                   <Button
@@ -277,18 +255,21 @@ function ReservationRow({
                     variant="danger"
                     className="w-full"
                     onClick={() => {
-                      const reason =
-                        window.prompt('سبب رفض المهمة (اختياري)') ?? undefined;
-                      onUpdate('reject', reason);
+                      const reason = window.prompt(
+                        'سبب رفض المهمة (اختياري)',
+                      );
+                      if (reason === null) return;
+                      onUpdate('reject', reason.trim() || undefined);
                     }}
                   >
                     رفض المهمة
                   </Button>
                 </>
               )}
-              {reservation.effectiveStatus === 'LATE' && (
+              {(reservation.effectiveStatus === 'LATE' ||
+                reservation.effectiveStatus === 'EXPIRED') && (
                 <p className="rounded-lg bg-orange-50 p-3 text-xs text-orange-700">
-                  انتهى الموعد النهائي، لذلك لا يمكن تعليم المهمة كمكتملة.
+                  انتهى الموعد النهائي وتمت إعادة الصفحات إلى الفرص المتاحة.
                 </p>
               )}
             </aside>
@@ -358,7 +339,36 @@ export default function VolunteerWorkRequests() {
         queryKey: ['volunteer-my-reservations'],
       });
     },
+    onError: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ['volunteer-available-requests'],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ['volunteer-my-reservations'],
+      });
+    },
   });
+
+  const getUpdateError = (reservationId: number) => {
+    if (
+      !updateReservation.isError ||
+      updateReservation.variables?.id !== reservationId
+    ) {
+      return undefined;
+    }
+    const fallback =
+      updateReservation.variables.action === 'reject'
+        ? 'تعذر رفض المهمة. ربما انتهت المهلة وتمت إعادة الصفحات إلى الفرص المتاحة.'
+        : updateReservation.variables.file
+          ? 'تعذر إكمال المهمة. تأكد من اختيار ملف Word بصيغة .docx صالح.'
+          : 'تعذر إكمال المهمة.';
+    if (!axios.isAxiosError(updateReservation.error)) return fallback;
+    const message = updateReservation.error.response?.data?.message;
+    if (message === 'Reservation is no longer in progress') {
+      return 'هذه المهمة لم تعد قيد التنفيذ. ربما انتهت المهلة وتمت إعادة الصفحات إلى الفرص المتاحة.';
+    }
+    return fallback;
+  };
 
   return (
     <div className="space-y-8">
@@ -411,10 +421,7 @@ export default function VolunteerWorkRequests() {
               updateReservation.isPending &&
               updateReservation.variables?.id === reservation.id
             }
-            updateError={
-              updateReservation.isError &&
-              updateReservation.variables?.id === reservation.id
-            }
+            updateError={getUpdateError(reservation.id)}
             onUpdate={(action, reason, file) =>
               updateReservation.mutate({
                 id: reservation.id,

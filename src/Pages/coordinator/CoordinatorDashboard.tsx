@@ -9,7 +9,7 @@ const cards = [
   { key: 'rejectedRequests', label: 'طلبات مرفوضة', icon: FileX, color: 'bg-red-500' },
   { key: 'inProgressReservations', label: 'قيد التنفيذ', icon: Hourglass, color: 'bg-amber-500' },
   { key: 'doneReservations', label: 'تمت', icon: CheckCircle, color: 'bg-green-600' },
-  { key: 'lateReservations', label: 'متأخرة', icon: TimerOff, color: 'bg-orange-600' },
+  { key: 'lateReservations', label: 'منتهية', icon: TimerOff, color: 'bg-orange-600' },
 ] as const;
 
 export default function CoordinatorDashboard() {

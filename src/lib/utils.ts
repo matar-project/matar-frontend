@@ -6,5 +6,5 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatArabicPageRange(startPage: number, endPage: number) {
-  return `${endPage} - ${startPage}`;
+  return `\u2066${endPage} - ${startPage}\u2069`;
 }

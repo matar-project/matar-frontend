@@ -6,8 +6,6 @@ import {
 } from "@tanstack/react-query";
 import {
   BookOpen,
-  ChevronDown,
-  ChevronUp,
   Download,
   Pencil,
   Phone,
@@ -27,6 +25,7 @@ import {
 import { StatusBadge } from "../../Components/ui/StatusBadge";
 import { useDebouncedValue } from "../../Hooks/useDebouncedValue";
 import { InfiniteScrollTrigger } from "../../Components/InfiniteScrollTrigger";
+import { ExpandableCardHeader } from "../../Components/ExpandableCardHeader";
 
 const typeLabels = {
   PDF_TO_WORD: "PDF إلى Word",
@@ -107,11 +106,9 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
 
   return (
     <article className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-      <button
-        type="button"
-        className="flex w-full items-start justify-between gap-4 p-5 text-right transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-500"
-        onClick={() => setExpanded((current) => !current)}
-        aria-expanded={expanded}
+      <ExpandableCardHeader
+        expanded={expanded}
+        onToggle={() => setExpanded((current) => !current)}
       >
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
@@ -138,14 +135,7 @@ function RequestCard({ request }: { request: WorkflowRequest }) {
             )}
           </div>
         </div>
-        <span className="mt-1 rounded-lg bg-gray-100 p-2 text-gray-600">
-          {expanded ? (
-            <ChevronUp size={18} aria-hidden="true" />
-          ) : (
-            <ChevronDown size={18} aria-hidden="true" />
-          )}
-        </span>
-      </button>
+      </ExpandableCardHeader>
 
       {expanded && (
         <div className="border-t border-gray-100 p-5">
