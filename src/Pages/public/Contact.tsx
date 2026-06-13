@@ -15,6 +15,36 @@ export default function Contact() {
         <section aria-label="قنوات التواصل" className="space-y-6">
           <h2 className="text-xl font-semibold text-gray-900">قنوات التواصل</h2>
           <ul className="space-y-4" role="list">
+            <li>
+              <a
+                href="https://web.facebook.com/matarproject"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 p-4 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                aria-label="زيارة صفحتنا على فيسبوك (يفتح في نافذة جديدة)"
+              >
+                <span className="text-2xl" aria-hidden="true">👥</span>
+                <div>
+                  <div className="font-medium text-gray-900">فيسبوك</div>
+                  <div className="text-sm text-gray-500">صفحتنا على فيسبوك</div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://www.instagram.com/matar_project?igsh=Zm5sb3ZmYmNvNTAy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 p-4 bg-pink-50 border border-pink-200 rounded-xl hover:bg-pink-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
+                aria-label="زيارة صفحتنا على إنستغرام (يفتح في نافذة جديدة)"
+              >
+                <span className="text-2xl" aria-hidden="true">📸</span>
+                <div>
+                  <div className="font-medium text-gray-900">إنستغرام</div>
+                  <div className="text-sm text-gray-500">تابعونا على إنستغرام</div>
+                </div>
+              </a>
+            </li>
             {settings?.whatsappLink && (
               <li>
                 <a
@@ -28,23 +58,6 @@ export default function Contact() {
                   <div>
                     <div className="font-medium text-gray-900">واتساب</div>
                     <div className="text-sm text-gray-500">تواصل معنا مباشرة</div>
-                  </div>
-                </a>
-              </li>
-            )}
-            {settings?.facebookLink && (
-              <li>
-                <a
-                  href={settings.facebookLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-4 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                  aria-label="زيارة صفحتنا على فيسبوك (يفتح في نافذة جديدة)"
-                >
-                  <span className="text-2xl" aria-hidden="true">👥</span>
-                  <div>
-                    <div className="font-medium text-gray-900">فيسبوك</div>
-                    <div className="text-sm text-gray-500">صفحتنا على فيسبوك</div>
                   </div>
                 </a>
               </li>
@@ -64,11 +77,6 @@ export default function Contact() {
                     <div className="text-sm text-gray-500">راسلنا عبر ماسنجر</div>
                   </div>
                 </a>
-              </li>
-            )}
-            {!settings?.whatsappLink && !settings?.facebookLink && !settings?.messengerLink && (
-              <li className="text-gray-500 text-sm p-4 bg-gray-50 rounded-xl">
-                ستظهر قنوات التواصل هنا بمجرد إضافتها من قِبل الإدارة.
               </li>
             )}
           </ul>
