@@ -1,0 +1,30 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { workflowApi } from '../../../api/workflow';
+import { COORDINATOR_QUERY_KEYS } from '../../../constants/coordinator.constants';
+
+interface ReviewRequestVariables {
+  action: 'accept' | 'reject';
+  notes: string;
+}
+
+export function useReviewRequestMutation(requestId: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ action, notes }: ReviewRequestVariables) =>
+      action === 'accept'
+        ? workflowApi.acceptRequest(requestId, notes || undefined)
+        : workflowApi.rejectRequest(requestId, notes),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: COORDINATOR_QUERY_KEYS.requests,
+      });
+      queryClient.invalidateQueries({
+        queryKey: COORDINATOR_QUERY_KEYS.stats,
+      });
+      queryClient.invalidateQueries({
+        queryKey: COORDINATOR_QUERY_KEYS.libraryBooks,
+      });
+    },
+  });
+}

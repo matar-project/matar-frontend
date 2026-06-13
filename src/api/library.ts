@@ -1,5 +1,6 @@
 import { apiClient } from './client';
 import type { PaginatedResponse } from './pagination';
+import type { AdminLibraryFormValues } from '../schema/adminLibrary.schema';
 
 export interface LibraryFilters {
   search?: string;
@@ -86,10 +87,10 @@ export const libraryApi = {
       .get<LibraryResponse>('/library/admin/all', { params })
       .then((r) => r.data),
 
-  create: (dto: any) =>
+  create: (dto: AdminLibraryFormValues) =>
     apiClient.post('/library/admin', dto).then((r) => r.data),
 
-  update: (id: number, dto: any) =>
+  update: (id: number, dto: AdminLibraryFormValues) =>
     apiClient.patch(`/library/admin/${id}`, dto).then((r) => r.data),
 
   remove: (id: number) =>

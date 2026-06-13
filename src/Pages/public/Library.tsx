@@ -1,30 +1,12 @@
 import { useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { Download, FileAudio, FileText, File, type LucideIcon } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { libraryApi } from '../../api/library';
 import { InputField } from '../../Components/ui/FormField';
 import { Button } from '../../Components/ui/Button';
 import { InfiniteScrollTrigger } from '../../Components/InfiniteScrollTrigger';
 import { useDebouncedValue } from '../../Hooks/useDebouncedValue';
-
-const TYPE_LABELS: Record<string, { label: string; icon: LucideIcon; color: string }> = {
-  AUDIO:    { label: 'صوتي', icon: FileAudio, color: 'text-purple-600 bg-purple-50' },
-  WORD_DOC: { label: 'Word', icon: FileText, color: 'text-blue-600 bg-blue-50' },
-  PDF:      { label: 'PDF', icon: File, color: 'text-red-600 bg-red-50' },
-  BRAILLE:  { label: 'برايل', icon: FileText, color: 'text-yellow-600 bg-yellow-50' },
-  OTHER:    { label: 'أخرى', icon: File, color: 'text-gray-600 bg-gray-50' },
-};
-
-function ItemTypeTag({ type }: { type: string }) {
-  const t = TYPE_LABELS[type] ?? TYPE_LABELS.OTHER;
-  const Icon = t.icon;
-  return (
-    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${t.color}`}>
-      <Icon size={12} aria-hidden="true" />
-      {t.label}
-    </span>
-  );
-}
+import { useLibraryInfiniteQuery } from '../../Hooks/library/queries/useLibraryInfiniteQuery';
+import { LibraryItemTypeTag } from '../../Components/library/LibraryItemTypeTag';
 
 export default function Library() {
   const [search, setSearch] = useState('');
@@ -34,24 +16,10 @@ export default function Library() {
   const debouncedAuthor = useDebouncedValue(author, 500);
   const debouncedSubject = useDebouncedValue(subject, 500);
 
-  const libraryQuery = useInfiniteQuery({
-    queryKey: [
-      'library',
-      debouncedSearch,
-      debouncedAuthor,
-      debouncedSubject,
-    ],
-    queryFn: ({ pageParam }) =>
-      libraryApi.getAll({
-        search: debouncedSearch || undefined,
-        author: debouncedAuthor || undefined,
-        subject: debouncedSubject || undefined,
-        page: pageParam,
-        limit: 10,
-      }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasMore ? lastPage.page + 1 : undefined,
+  const libraryQuery = useLibraryInfiniteQuery('library', {
+    search: debouncedSearch || undefined,
+    author: debouncedAuthor || undefined,
+    subject: debouncedSubject || undefined,
   });
   const items = libraryQuery.data?.pages.flatMap((page) => page.data) ?? [];
   const total = libraryQuery.data?.pages[0]?.total ?? 0;
@@ -113,7 +81,7 @@ export default function Library() {
                   <article className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3 h-full flex flex-col">
                     <div className="flex items-start justify-between gap-2">
                       <h2 className="text-base font-bold text-gray-900 leading-snug flex-1">{item.title}</h2>
-                      <ItemTypeTag type={item.itemType} />
+                      <LibraryItemTypeTag type={item.itemType} />
                     </div>
                     {item.author && <p className="text-sm text-gray-500">{item.author}</p>}
                     {item.subject && <p className="text-xs text-primary-600 font-medium">{item.subject}</p>}

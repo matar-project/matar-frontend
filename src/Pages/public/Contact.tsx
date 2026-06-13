@@ -1,8 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
-import { settingsApi } from '../../api/settings';
+import { usePublicSettingsQuery } from '../../Hooks/public/queries/usePublicSettingsQuery';
 
 export default function Contact() {
-  const { data: settings } = useQuery({ queryKey: ['settings'], queryFn: settingsApi.get });
+  const { data: settings } = usePublicSettingsQuery();
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-16 space-y-12">

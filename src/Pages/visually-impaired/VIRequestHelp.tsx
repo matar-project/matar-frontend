@@ -1,131 +1,33 @@
 import { useState } from 'react';
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useWatch } from 'react-hook-form';
-import { z } from 'zod';
 import { Download } from 'lucide-react';
-import { requestsApi, type CreateRequestDto } from '../../api/requests';
+import { requestsApi } from '../../api/requests';
 import { Button } from '../../Components/ui/Button';
 import { InputField, SelectField, TextareaField } from '../../Components/ui/FormField';
 import { StatusBadge } from '../../Components/ui/StatusBadge';
 import { InfiniteScrollTrigger } from '../../Components/InfiniteScrollTrigger';
 import { useAuth } from '../../Hooks/auth/UseAuth';
+import { useMyRequestsInfiniteQuery } from '../../Hooks/visuallyImpaired/queries/useMyRequestsInfiniteQuery';
+import { useRequestHelpForm } from '../../Hooks/visuallyImpaired/useRequestHelpForm';
+import { REQUEST_TYPE_LABELS } from '../../constants/volunteerOpportunities.constants';
 
-const typeLabels: Record<string, string> = {
-  PDF_TO_WORD: 'PDF إلى Word',
-  PDF_TO_AUDIO: 'PDF إلى تسجيل صوتي',
-  ACCOMPANIMENT: 'طلب مرافقة',
-};
-
-const schema = z
-  .object({
-    requestType: z.enum(['PDF_TO_WORD', 'PDF_TO_AUDIO', 'ACCOMPANIMENT']),
-    bookName: z.string().optional(),
-    details: z.string().min(10, 'يرجى كتابة 10 أحرف على الأقل'),
-    pdfFile: z.custom<FileList>().optional(),
-    totalPages: z.string().optional(),
-  })
-  .superRefine((value, context) => {
-    if (value.requestType === 'ACCOMPANIMENT') return;
-    if (!value.bookName?.trim()) {
-      context.addIssue({
-        code: 'custom',
-        path: ['bookName'],
-        message: 'اسم الكتاب مطلوب',
-      });
-    }
-    const totalPages = Number(value.totalPages);
-    if (!Number.isInteger(totalPages) || totalPages < 1) {
-      context.addIssue({
-        code: 'custom',
-        path: ['totalPages'],
-        message: 'عدد الصفحات مطلوب ويجب أن يكون رقما موجبا',
-      });
-    }
-    const file = value.pdfFile?.[0];
-    if (!file) {
-      context.addIssue({
-        code: 'custom',
-        path: ['pdfFile'],
-        message: 'ملف PDF مطلوب',
-      });
-      return;
-    }
-    if (file.type !== 'application/pdf' || !file.name.toLowerCase().endsWith('.pdf')) {
-      context.addIssue({
-        code: 'custom',
-        path: ['pdfFile'],
-        message: 'يسمح بملفات PDF فقط',
-      });
-    }
-    if (file.size > 25 * 1024 * 1024) {
-      context.addIssue({
-        code: 'custom',
-        path: ['pdfFile'],
-        message: 'حجم الملف يجب ألا يتجاوز 25 ميجابايت',
-      });
-    }
-  });
-
-type FormValues = z.infer<typeof schema>;
 type Tab = 'list' | 'new';
 
 export default function VIRequestHelp() {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>('list');
 
   const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useInfiniteQuery({
-      queryKey: ['my-requests'],
-      initialPageParam: 1,
-      queryFn: ({ pageParam }) =>
-        requestsApi.getMyRequests({ page: pageParam as number, limit: 10 }),
-      getNextPageParam: (lastPage) =>
-        lastPage.hasMore ? lastPage.page + 1 : undefined,
-    });
+    useMyRequestsInfiniteQuery();
 
   const requests = data?.pages.flatMap((p) => p.data) ?? [];
 
   const {
     register,
-    handleSubmit,
-    control,
-    reset,
     formState: { errors },
-  } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      requestType: 'PDF_TO_WORD',
-      bookName: '',
-      details: '',
-      totalPages: '',
-    },
-  });
-  const requestType = useWatch({ control, name: 'requestType' });
-  const isPdfRequest = requestType !== 'ACCOMPANIMENT';
-
-  const mutation = useMutation({
-    mutationFn: ({ data: dto, file }: { data: CreateRequestDto; file?: File }) =>
-      requestsApi.createRequest(dto, file),
-    onSuccess: () => {
-      reset();
-      void queryClient.invalidateQueries({ queryKey: ['my-requests'] });
-      setTab('list');
-    },
-  });
-
-  const submit = (values: FormValues) => {
-    mutation.mutate({
-      data: {
-        requestType: values.requestType,
-        ...(isPdfRequest ? { bookName: values.bookName?.trim() } : {}),
-        details: values.details.trim(),
-        ...(isPdfRequest ? { totalPages: Number(values.totalPages) } : {}),
-      },
-      file: isPdfRequest ? values.pdfFile?.[0] : undefined,
-    });
-  };
+    isPdfRequest,
+    mutation,
+    onSubmit,
+  } = useRequestHelpForm(() => setTab('list'));
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -167,15 +69,15 @@ export default function VIRequestHelp() {
               </Button>
             </div>
           )}
-          {requests.map((req: any) => (
+          {requests.map((req) => (
             <div key={req.id} className="rounded-2xl bg-white p-5 shadow-sm space-y-2">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="font-semibold text-gray-900 text-sm">
-                    {req.bookName ?? typeLabels[req.requestType] ?? req.requestType}
+                    {req.bookName ?? REQUEST_TYPE_LABELS[req.requestType]}
                   </p>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    {typeLabels[req.requestType]}
+                    {REQUEST_TYPE_LABELS[req.requestType]}
                   </p>
                 </div>
                 <StatusBadge status={req.status} />
@@ -188,17 +90,23 @@ export default function VIRequestHelp() {
               )}
               <div className="flex items-center justify-between gap-3 pt-1">
                 <p className="text-xs text-gray-400">
-                  {new Date(req.createdAt).toLocaleDateString('ar-JO', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
+                  {new Date(req.createdAt).toLocaleDateString(
+                    'ar-JO-u-nu-latn',
+                    {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    },
+                  )}
                 </p>
                 {req.status === 'DONE' && (
                   req.outputOriginalName ? (
                     <button
                       onClick={() =>
-                        void requestsApi.downloadOutputFile(req.id, req.outputOriginalName)
+                        void requestsApi.downloadOutputFile(
+                          req.id,
+                          req.outputOriginalName!,
+                        )
                       }
                       className="inline-flex items-center gap-1.5 rounded-lg bg-teal-50 px-3 py-1.5 text-xs font-medium text-teal-700 hover:bg-teal-100 transition-colors"
                     >
@@ -222,7 +130,7 @@ export default function VIRequestHelp() {
 
       {tab === 'new' && (
         <form
-          onSubmit={handleSubmit(submit)}
+          onSubmit={onSubmit}
           className="space-y-6 rounded-2xl bg-white p-6 shadow-sm md:p-8"
           noValidate
         >

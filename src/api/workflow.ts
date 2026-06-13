@@ -12,7 +12,12 @@ export type CoordinatorRequestFilter =
   | 'ALL'
   | 'IN_PROGRESS'
   | 'AWAITING_COMPLETION_APPROVAL';
-export type ReservationStatus = 'IN_PROGRESS' | 'DONE' | 'REJECTED' | 'LATE';
+export type ReservationStatus =
+  | 'IN_PROGRESS'
+  | 'DONE'
+  | 'REJECTED'
+  | 'EXPIRED'
+  | 'LATE';
 
 export interface WorkflowRequest {
   id: number;
@@ -80,6 +85,8 @@ export interface ReservedRange {
 export interface AvailableRequest extends WorkflowRequest {
   reservedRanges: ReservedRange[];
   nextAvailablePage: number | null;
+  availableRanges: Array<{ startPage: number; endPage: number }>;
+  totalAvailablePages: number;
 }
 
 export interface Reservation {
@@ -245,10 +252,10 @@ export const workflowApi = {
         { params },
       )
       .then((response) => response.data),
-  reservePages: (requestId: number, endPage: number) =>
+  reservePages: (requestId: number, pageCount: number) =>
     apiClient
-      .post<Reservation>(`/volunteer/requests/${requestId}/reservations`, {
-        endPage,
+      .post<Reservation[]>(`/volunteer/requests/${requestId}/reservations`, {
+        pageCount,
       })
       .then((response) => response.data),
   claimAccompaniment: (requestId: number) =>
@@ -286,5 +293,9 @@ export const workflowApi = {
   rejectReservation: (id: number, reason?: string) =>
     apiClient
       .patch<Reservation>(`/volunteer/reservations/${id}/reject`, { reason })
+      .then((response) => response.data),
+  rejectVolunteerReservation: (id: number, reason?: string) =>
+    apiClient
+      .patch<Reservation>(`/coordinator/reservations/${id}/reject`, { reason })
       .then((response) => response.data),
 };

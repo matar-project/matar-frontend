@@ -1,13 +1,8 @@
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { settingsApi } from '../../api/settings';
+import { usePublicSettingsQuery } from '../../Hooks/public/queries/usePublicSettingsQuery';
 
 export function Footer() {
-  const { data: settings } = useQuery({
-    queryKey: ['settings'],
-    queryFn: settingsApi.get,
-    staleTime: 5 * 60_000,
-  });
+  const { data: settings } = usePublicSettingsQuery();
 
   return (
     <footer className="bg-primary-900 text-primary-200 mt-auto" role="contentinfo">

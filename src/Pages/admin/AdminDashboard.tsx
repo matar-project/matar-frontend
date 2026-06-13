@@ -1,26 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
-import { requestsApi } from '../../api/requests';
-import { volunteersApi } from '../../api/volunteers';
 import { Users, BookOpen, Library, CheckCircle } from 'lucide-react';
-
-function StatCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: number; color: string }) {
-  return (
-    <div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
-      <div className={`p-3 rounded-xl ${color}`}>
-        <Icon size={24} aria-hidden="true" className="text-white" />
-      </div>
-      <div>
-        <p className="text-sm text-gray-500">{label}</p>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
-      </div>
-    </div>
-  );
-}
+import { StatCard } from '../../Components/ui/StatCard';
+import { useAdminStatsQuery } from '../../Hooks/admin/queries/useAdminStatsQuery';
+import { useRecentAdminRequestsQuery } from '../../Hooks/admin/queries/useRecentAdminRequestsQuery';
+import { useRecentVolunteersQuery } from '../../Hooks/admin/queries/useRecentVolunteersQuery';
 
 export default function AdminDashboard() {
-  const { data: stats } = useQuery({ queryKey: ['stats'], queryFn: requestsApi.getStats });
-  const { data: volunteers } = useQuery({ queryKey: ['admin-volunteers'], queryFn: () => volunteersApi.getAll({ page: 1, limit: 5 }) });
-  const { data: requests } = useQuery({ queryKey: ['admin-requests'], queryFn: () => requestsApi.getRequests({ page: 1, limit: 5 }) });
+  const { data: stats } = useAdminStatsQuery();
+  const { data: volunteers } = useRecentVolunteersQuery();
+  const { data: requests } = useRecentAdminRequestsQuery();
 
   return (
     <div className="space-y-6">
@@ -41,11 +28,11 @@ export default function AdminDashboard() {
           <h2 className="font-semibold text-gray-900">آخر الطلبات</h2>
           {requests?.data?.length === 0 && <p className="text-gray-400 text-sm">لا توجد طلبات</p>}
           <ul className="divide-y divide-gray-100" role="list">
-            {requests?.data?.map((r: any) => (
+            {requests?.data?.map((r) => (
               <li key={r.id} className="py-3 flex items-center justify-between gap-2">
                 <div>
                   <p className="text-sm font-medium text-gray-800">{r.fullName}</p>
-                  <p className="text-xs text-gray-500">{r.city} · {new Date(r.createdAt).toLocaleDateString('ar-JO')}</p>
+                  <p className="text-xs text-gray-500">{r.city} · {new Date(r.createdAt).toLocaleDateString('ar-JO-u-nu-latn')}</p>
                 </div>
                 <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                   r.status === 'NEW' ? 'bg-blue-100 text-blue-700' :
@@ -64,7 +51,7 @@ export default function AdminDashboard() {
           <h2 className="font-semibold text-gray-900">آخر المتطوعين</h2>
           {volunteers?.data?.length === 0 && <p className="text-gray-400 text-sm">لا يوجد متطوعون</p>}
           <ul className="divide-y divide-gray-100" role="list">
-            {volunteers?.data?.map((v: any) => (
+            {volunteers?.data?.map((v) => (
               <li key={v.id} className="py-3 flex items-center justify-between gap-2">
                 <div>
                   <p className="text-sm font-medium text-gray-800">{v.name}</p>

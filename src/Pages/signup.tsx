@@ -7,19 +7,11 @@ import logo from '../assets/logo.png';
 import Select from 'react-select';
 import {
   getCountryCallingCode,
-  getCountries,
   type Country,
 } from 'react-phone-number-input';
 import PhoneNumberInput from 'react-phone-number-input/input';
-import ar from 'react-phone-number-input/locale/ar';
 import { cn } from '../lib/utils';
-
-const COUNTRY_OPTIONS = getCountries()
-  .map((code) => ({
-    value: code,
-    label: `${ar[code] ?? code} (+${getCountryCallingCode(code)})`,
-  }))
-  .sort((a, b) => a.label.localeCompare(b.label, 'ar'));
+import { COUNTRY_OPTIONS } from '../constants/signup.constants';
 
 function Signup() {
   const navigate = useNavigate();

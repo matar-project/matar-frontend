@@ -1,12 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
 import { Phone } from 'lucide-react';
-import { settingsApi } from '../api/settings';
+import { usePublicSettingsQuery } from '../Hooks/public/queries/usePublicSettingsQuery';
 
 export function CoordinatorContactCard() {
-  const { data } = useQuery({
-    queryKey: ['settings'],
-    queryFn: settingsApi.get,
-  });
+  const { data } = usePublicSettingsQuery();
 
   if (!data?.coordinatorPhone) return null;
 

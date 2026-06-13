@@ -1,28 +1,13 @@
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { BookOpen, Users, CheckCircle, Library, type LucideIcon } from 'lucide-react';
-import { requestsApi } from '../../api/requests';
+import { BookOpen, Users, CheckCircle, Library } from 'lucide-react';
 import { useAuth } from '../../Hooks/auth/UseAuth';
-
-function StatCard({ icon: Icon, value, label }: { icon: LucideIcon; value: number | string; label: string }) {
-  return (
-    <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-      <Icon className="mx-auto mb-3 text-secondary-500" size={32} aria-hidden="true" />
-      <div className="text-3xl font-bold text-gray-900 mb-1">{value}</div>
-      <div className="text-gray-500 text-sm">{label}</div>
-    </div>
-  );
-}
-
-const stories = [
-  { name: 'أحمد م.', text: 'بفضل مشروع مطر حصلت على كتبي الدراسية بصيغة صوتية وتمكنت من النجاح في امتحاناتي.' },
-  { name: 'سارة خ.', text: 'انضممت كمتطوعة وشعرت بالفرق الحقيقي الذي يصنعه التطوع في حياة شخص آخر.' },
-  { name: 'محمد ع.', text: 'وجدت في مكتبة مطر مواد تعليمية لم أجدها في أي مكان آخر بصيغة يسهل عليّ قراءتها.' },
-];
+import { usePublicStatsQuery } from '../../Hooks/public/queries/usePublicStatsQuery';
+import { PublicStatCard } from '../../Components/public/PublicStatCard';
+import { SUCCESS_STORIES } from '../../constants/home.constants';
 
 export default function Home() {
   const { user } = useAuth();
-  const { data: stats } = useQuery({ queryKey: ['stats'], queryFn: requestsApi.getStats });
+  const { data: stats } = usePublicStatsQuery();
   const canRequestHelp = user?.role === 'visually_impired';
   const canVolunteer = user?.role === 'volunteer';
 
@@ -127,10 +112,10 @@ export default function Home() {
           <div className="max-w-5xl mx-auto">
             <h2 className="text-3xl font-bold text-center mb-12">أثرنا</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <StatCard icon={Users} value={stats.totalVolunteers} label="متطوع" />
-              <StatCard icon={BookOpen} value={stats.totalRequests} label="طلب مساعدة" />
-              <StatCard icon={CheckCircle} value={stats.completedRequests} label="طلب مكتمل" />
-              <StatCard icon={Library} value={stats.libraryItems} label="مادة في المكتبة" />
+              <PublicStatCard icon={Users} value={stats.totalVolunteers} label="متطوع" />
+              <PublicStatCard icon={BookOpen} value={stats.totalRequests} label="طلب مساعدة" />
+              <PublicStatCard icon={CheckCircle} value={stats.completedRequests} label="طلب مكتمل" />
+              <PublicStatCard icon={Library} value={stats.libraryItems} label="مادة في المكتبة" />
             </div>
           </div>
         </section>
@@ -141,7 +126,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">قصص نجاح</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {stories.map((s) => (
+            {SUCCESS_STORIES.map((s) => (
               <blockquote key={s.name} className="bg-gray-50 rounded-xl p-6 space-y-4">
                 <p className="text-gray-700 leading-relaxed">"{s.text}"</p>
                 <footer className="text-sm font-medium text-primary-600">— {s.name}</footer>

@@ -1,17 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
 import { BookOpen, CheckCircle, Clock, Library } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { workflowApi } from '../../api/workflow';
 import { CoordinatorContactCard } from '../../Components/CoordinatorContactCard';
 import { useAuth } from '../../Hooks/auth/UseAuth';
+import { useVolunteerDashboardQuery } from '../../Hooks/volunteer/queries/useVolunteerDashboardQuery';
 
 export default function VolunteerDashboard() {
   const { user } = useAuth();
-  const { data: stats, isLoading } = useQuery({
-    queryKey: ['volunteer-dashboard'],
-    queryFn: workflowApi.getVolunteerDashboard,
-    refetchInterval: 60_000,
-  });
+  const { data: stats, isLoading } = useVolunteerDashboardQuery();
 
   return (
     <div className="space-y-6">

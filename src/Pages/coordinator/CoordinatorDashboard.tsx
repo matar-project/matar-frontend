@@ -1,22 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
-import { CheckCircle, Clock, FileCheck, FileX, Hourglass, TimerOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { workflowApi } from '../../api/workflow';
-
-const cards = [
-  { key: 'pendingRequests', label: 'طلبات بانتظار الموزع', icon: Clock, color: 'bg-blue-500' },
-  { key: 'acceptedRequests', label: 'طلبات مقبولة', icon: FileCheck, color: 'bg-emerald-500' },
-  { key: 'rejectedRequests', label: 'طلبات مرفوضة', icon: FileX, color: 'bg-red-500' },
-  { key: 'inProgressReservations', label: 'قيد التنفيذ', icon: Hourglass, color: 'bg-amber-500' },
-  { key: 'doneReservations', label: 'تمت', icon: CheckCircle, color: 'bg-green-600' },
-  { key: 'lateReservations', label: 'متأخرة', icon: TimerOff, color: 'bg-orange-600' },
-] as const;
+import { useCoordinatorStatsQuery } from '../../Hooks/coordinator/queries/useCoordinatorStatsQuery';
+import { COORDINATOR_DASHBOARD_CARDS } from '../../constants/coordinator.constants';
 
 export default function CoordinatorDashboard() {
-  const { data: stats } = useQuery({
-    queryKey: ['coordinator-stats'],
-    queryFn: workflowApi.getCoordinatorStats,
-  });
+  const { data: stats } = useCoordinatorStatsQuery();
 
   return (
     <div className="space-y-6">
@@ -25,7 +12,7 @@ export default function CoordinatorDashboard() {
         <p className="mt-1 text-sm text-gray-500">متابعة الطلبات وحجوزات المتطوعين</p>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {cards.map(({ key, label, icon: Icon, color }) => (
+        {COORDINATOR_DASHBOARD_CARDS.map(({ key, label, icon: Icon, color }) => (
           <div key={key} className="flex items-center gap-4 rounded-xl bg-white p-5 shadow-sm">
             <div className={`rounded-xl p-3 ${color}`}>
               <Icon className="text-white" size={22} aria-hidden="true" />
