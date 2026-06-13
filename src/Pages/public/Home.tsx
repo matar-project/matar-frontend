@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, Users, CheckCircle, Library, Globe, FileText, Truck, PhoneCall, Award } from 'lucide-react';
+import { BookOpen, Users, CheckCircle, Library, Globe, FileText, Truck, PhoneCall, Award, ExternalLink } from 'lucide-react';
 import { useAuth } from '../../Hooks/auth/UseAuth';
 import { usePublicStatsQuery } from '../../Hooks/public/queries/usePublicStatsQuery';
 import { PublicStatCard } from '../../Components/public/PublicStatCard';
@@ -142,9 +142,24 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">قصص نجاح</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {SUCCESS_STORIES.map((s) => (
-              <blockquote key={s.name} className="bg-gray-50 rounded-xl p-6 space-y-4">
-                <p className="text-gray-700 leading-relaxed">"{s.text}"</p>
-                <footer className="text-sm font-medium text-primary-600">— {s.name}</footer>
+              <blockquote key={s.name} className="bg-gray-50 rounded-xl p-6 flex flex-col gap-4">
+                <p className="text-gray-700 leading-relaxed flex-1">"{s.text}"</p>
+                <footer className="flex items-end justify-between gap-2">
+                  <div>
+                    <div className="text-sm font-semibold text-primary-600">— {s.name}</div>
+                    <div className="text-xs text-gray-400 mt-0.5">{s.achievement}</div>
+                  </div>
+                  <a
+                    href={s.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-xs text-gray-400 hover:text-primary-600 transition-colors shrink-0"
+                    aria-label={`المنشور الأصلي لـ${s.name}`}
+                  >
+                    <ExternalLink size={12} />
+                    المنشور
+                  </a>
+                </footer>
               </blockquote>
             ))}
           </div>
