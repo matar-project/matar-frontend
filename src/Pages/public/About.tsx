@@ -1,4 +1,4 @@
-import { Award, Users, Globe, BookOpen, FileText, Truck, PhoneCall, CheckCircle } from 'lucide-react';
+import { Award, Users, Globe, BookOpen, FileText, Truck, PhoneCall } from 'lucide-react';
 
 const TEN_YEAR_STATS = [
   { icon: Award, value: '128,591', label: 'فرصة تطوعية إجمالية' },
@@ -8,17 +8,6 @@ const TEN_YEAR_STATS = [
   { icon: FileText, value: '2,072,830', label: 'صفحة طُبعت أو سُجّلت' },
   { icon: Truck, value: '45', label: 'موزّع' },
   { icon: PhoneCall, value: '671', label: 'طلب مرافقة' },
-];
-
-const STATS_2025 = [
-  { icon: BookOpen, value: '1,348', label: 'كتاب' },
-  { icon: FileText, value: '243,436', label: 'صفحة' },
-  { icon: Award, value: '8,369', label: 'فرصة تطوعية' },
-  { icon: Users, value: '82', label: 'طالب كفيف جديد' },
-  { icon: Users, value: '1,082', label: 'إجمالي الطلاب المكفوفين' },
-  { icon: Globe, value: '25', label: 'دولة' },
-  { icon: CheckCircle, value: '112', label: 'شهادة تطوع' },
-  { icon: CheckCircle, value: '126', label: 'شهادة شكر' },
 ];
 
 export default function About() {
@@ -71,34 +60,19 @@ export default function About() {
       <section aria-label="أثرنا" className="space-y-10">
         <h2 className="text-2xl font-bold text-gray-900">أثرنا حتى الآن</h2>
 
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-primary-700">خلال 10 سنوات (2013 – 2024)</h3>
-          <p className="text-gray-600 text-sm leading-relaxed">
-            بدأنا بخمسة متطوعين عام 2013 ووصلنا إلى 33,278 فرصة تطوعية في عام 2022 وحده، لنُحقق إجمالياً خلال العقد:
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {TEN_YEAR_STATS.map((s) => (
-              <div key={s.label} className="bg-primary-50 rounded-xl p-5 text-center space-y-2">
-                <s.icon className="mx-auto text-primary-600" size={28} aria-hidden="true" />
-                <div className="text-2xl font-bold text-gray-900">{s.value}</div>
-                <div className="text-xs text-gray-500">{s.label}</div>
-              </div>
-            ))}
-          </div>
+        <p className="text-gray-600 text-sm leading-relaxed">
+          بدأنا بخمسة متطوعين عام 2013 ووصلنا إلى 33,278 فرصة تطوعية في عام 2022 وحده، لنُحقق إجمالياً خلال العقد:
+        </p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {TEN_YEAR_STATS.map((s) => (
+            <div key={s.label} className="bg-primary-50 rounded-xl p-5 text-center space-y-2">
+              <s.icon className="mx-auto text-primary-600" size={28} aria-hidden="true" />
+              <div className="text-2xl font-bold text-gray-900">{s.value}</div>
+              <div className="text-xs text-gray-500">{s.label}</div>
+            </div>
+          ))}
         </div>
 
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-secondary-600">إنجازات 2025</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {STATS_2025.map((s, i) => (
-              <div key={i} className="bg-secondary-50 rounded-xl p-5 text-center space-y-2">
-                <s.icon className="mx-auto text-secondary-500" size={28} aria-hidden="true" />
-                <div className="text-2xl font-bold text-gray-900">{s.value}</div>
-                <div className="text-xs text-gray-500">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
     </div>
   );
