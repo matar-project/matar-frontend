@@ -1,3 +1,15 @@
+import { Award, Users, Globe, BookOpen, FileText, Truck, PhoneCall } from 'lucide-react';
+
+const TEN_YEAR_STATS = [
+  { icon: Award, value: '128,591', label: 'فرصة تطوعية إجمالية' },
+  { icon: Users, value: '1,114', label: 'مكفوف مستفيد' },
+  { icon: Globe, value: '18', label: 'دولة وصلنا إليها' },
+  { icon: BookOpen, value: '10,419', label: 'كتاب مسجّل أو مطبوع' },
+  { icon: FileText, value: '2,072,830', label: 'صفحة طُبعت أو سُجّلت' },
+  { icon: Truck, value: '45', label: 'موزّع' },
+  { icon: PhoneCall, value: '671', label: 'طلب مرافقة' },
+];
+
 export default function About() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-16 space-y-16">
@@ -45,12 +57,22 @@ export default function About() {
         ))}
       </div>
 
-      <section aria-label="أثرنا" className="space-y-4">
+      <section aria-label="أثرنا" className="space-y-10">
         <h2 className="text-2xl font-bold text-gray-900">أثرنا حتى الآن</h2>
-        <p className="text-gray-700 leading-relaxed">
-          منذ انطلاقنا ساعدنا مئات المستفيدين على الوصول إلى مواد تعليمية كانت بعيدة عن متناولهم.
-          شبكة متطوعينا تنمو يوماً بعد يوم، وكل مادة تُضاف إلى مكتبتنا هي خطوة نحو عالم أكثر إنصافاً.
+
+        <p className="text-gray-600 text-sm leading-relaxed">
+          بدأنا بخمسة متطوعين عام 2013 ووصلنا إلى 33,278 فرصة تطوعية في عام 2022 وحده، لنُحقق إجمالياً خلال العقد:
         </p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {TEN_YEAR_STATS.map((s) => (
+            <div key={s.label} className="bg-primary-50 rounded-xl p-5 text-center space-y-2">
+              <s.icon className="mx-auto text-primary-600" size={28} aria-hidden="true" />
+              <div className="text-2xl font-bold text-gray-900">{s.value}</div>
+              <div className="text-xs text-gray-500">{s.label}</div>
+            </div>
+          ))}
+        </div>
+
       </section>
     </div>
   );

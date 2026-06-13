@@ -7,7 +7,7 @@ import logoMark from '../../assets/logo-mark.png';
 
 const navLinks = [
   { to: '/', label: 'الرئيسية' },
-  { to: '/about', label: 'عن مطر' },
+  { to: '/about', label: 'عن مشروع مطر' },
   { to: '/contact', label: 'تواصل معنا' },
 ];
 
