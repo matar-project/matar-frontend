@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, Users, CheckCircle, Library } from 'lucide-react';
+import { BookOpen, Users, CheckCircle, Library, Globe, FileText, Truck, PhoneCall, Award } from 'lucide-react';
 import { useAuth } from '../../Hooks/auth/UseAuth';
 import { usePublicStatsQuery } from '../../Hooks/public/queries/usePublicStatsQuery';
 import { PublicStatCard } from '../../Components/public/PublicStatCard';
@@ -107,19 +107,46 @@ export default function Home() {
       </section>
 
       {/* Stats */}
-      {stats && (
-        <section className="py-16 px-4 bg-primary-600 text-white" aria-label="إحصاءات المشروع">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-12">أثرنا</h2>
+      <section className="py-16 px-4 bg-primary-600 text-white" aria-label="إحصاءات المشروع">
+        <div className="max-w-5xl mx-auto space-y-12">
+          <h2 className="text-3xl font-bold text-center">أثرنا</h2>
+
+          {stats && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <PublicStatCard icon={Users} value={stats.totalVolunteers} label="متطوع" />
               <PublicStatCard icon={BookOpen} value={stats.totalRequests} label="طلب مساعدة" />
               <PublicStatCard icon={CheckCircle} value={stats.completedRequests} label="طلب مكتمل" />
               <PublicStatCard icon={Library} value={stats.libraryItems} label="مادة في المكتبة" />
             </div>
+          )}
+
+          <div className="border-t border-white/20 pt-10 space-y-6">
+            <p className="text-center text-primary-200 font-semibold text-lg">خلال 10 سنوات (2013 – 2024)</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <PublicStatCard icon={Award} value="128,591" label="فرصة تطوعية" />
+              <PublicStatCard icon={Users} value="1,114" label="مكفوف مستفيد" />
+              <PublicStatCard icon={Globe} value="18" label="دولة" />
+              <PublicStatCard icon={BookOpen} value="10,419" label="كتاب مسجّل أو مطبوع" />
+              <PublicStatCard icon={FileText} value="2,072,830" label="صفحة" />
+              <PublicStatCard icon={Truck} value="45" label="موزّع" />
+              <PublicStatCard icon={PhoneCall} value="671" label="طلب مرافقة" />
+            </div>
           </div>
-        </section>
-      )}
+
+          <div className="border-t border-white/20 pt-10 space-y-6">
+            <p className="text-center text-primary-200 font-semibold text-lg">إنجازات 2025</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <PublicStatCard icon={BookOpen} value="1,348" label="كتاب" />
+              <PublicStatCard icon={FileText} value="243,436" label="صفحة" />
+              <PublicStatCard icon={Award} value="8,369" label="فرصة تطوعية" />
+              <PublicStatCard icon={Users} value="259" label="طالب كفيف" />
+              <PublicStatCard icon={Globe} value="25" label="دولة" />
+              <PublicStatCard icon={CheckCircle} value="112" label="شهادة تطوع" />
+              <PublicStatCard icon={CheckCircle} value="126" label="شهادة شكر" />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Stories */}
       <section className="py-16 px-4 bg-white" aria-label="قصص النجاح">
