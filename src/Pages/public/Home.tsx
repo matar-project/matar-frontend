@@ -139,7 +139,8 @@ export default function Home() {
               <PublicStatCard icon={BookOpen} value="1,348" label="كتاب" />
               <PublicStatCard icon={FileText} value="243,436" label="صفحة" />
               <PublicStatCard icon={Award} value="8,369" label="فرصة تطوعية" />
-              <PublicStatCard icon={Users} value="259" label="طالب كفيف" />
+              <PublicStatCard icon={Users} value="82" label="طالب كفيف جديد" />
+              <PublicStatCard icon={Users} value="1,082" label="إجمالي الطلاب المكفوفين" />
               <PublicStatCard icon={Globe} value="25" label="دولة" />
               <PublicStatCard icon={CheckCircle} value="112" label="شهادة تطوع" />
               <PublicStatCard icon={CheckCircle} value="126" label="شهادة شكر" />
