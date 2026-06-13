@@ -10,11 +10,10 @@ export default function Contact() {
         <p className="text-lg text-gray-600">نسعد بسماعك ومساعدتك</p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Contact channels */}
+      <div>
         <section aria-label="قنوات التواصل" className="space-y-6">
           <h2 className="text-xl font-semibold text-gray-900">قنوات التواصل</h2>
-          <ul className="space-y-4" role="list">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4" role="list">
             <li>
               <a
                 href="https://web.facebook.com/matarproject"
@@ -82,15 +81,6 @@ export default function Contact() {
           </ul>
         </section>
 
-        {/* Quick actions */}
-        <section aria-label="روابط سريعة" className="space-y-6">
-          <h2 className="text-xl font-semibold text-gray-900">هل تبحث عن؟</h2>
-          <div className="space-y-3">
-            <p className="p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-600">
-              سجّل الدخول للوصول إلى الخدمات والمكتبة من لوحة التحكم الخاصة بحسابك.
-            </p>
-          </div>
-        </section>
       </div>
     </div>
   );
