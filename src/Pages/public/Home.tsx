@@ -91,7 +91,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { step: '١', title: 'طلب المساعدة', desc: 'يطلب المستفيد الكتاب أو المادة التعليمية التي يحتاجها عبر نموذج بسيط.' },
-              { step: '٢', title: 'تطوع وتحويل', desc: 'يتولى المتطوعون تسجيل الكتب صوتياً أو تحويلها إلى صيغة نصية سهلة القراءة.' },
+              { step: '٢', title: 'تطوع في التسجيل الصوتي أو التحويل لوورد أو المرافقة', desc: 'يتولى المتطوعون تسجيل الكتب صوتياً أو تحويلها إلى ملفات وورد.' },
               { step: '٣', title: 'إتاحة المواد', desc: 'تُضاف المواد المحوّلة إلى المكتبة لتستفيد منها أوسع شريحة ممكنة.' },
             ].map((item) => (
               <div key={item.step} className="bg-white rounded-xl p-6 shadow-sm text-center space-y-3">
