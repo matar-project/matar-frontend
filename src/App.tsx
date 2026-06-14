@@ -21,6 +21,7 @@ import AdminRequests from "./Pages/admin/AdminRequests";
 import AdminVolunteers from "./Pages/admin/AdminVolunteers";
 import AdminLibrary from "./Pages/admin/AdminLibrary";
 import AdminSettings from "./Pages/admin/AdminSettings";
+import AdminVerifications from "./Pages/admin/AdminVerifications";
 
 // Volunteer pages
 import VolunteerDashboard from "./Pages/volunteer/VolunteerDashboard";
@@ -38,6 +39,9 @@ import CoordinatorReservations from "./Pages/coordinator/CoordinatorReservations
 // Auth
 import Login from "./Pages/login";
 import Signup from "./Pages/signup";
+import VerifyEmail from "./Pages/VerifyEmail";
+import AccountPending from "./Pages/AccountPending";
+import AccountRejected from "./Pages/AccountRejected";
 
 function App() {
   return (
@@ -47,6 +51,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
       </Route>
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/account-pending" element={<AccountPending />} />
+      <Route path="/account-rejected" element={<AccountRejected />} />
 
       {/* Public website */}
       <Route element={<PublicLayout />}>
@@ -65,6 +72,7 @@ function App() {
           <Route path="/admin/volunteers" element={<AdminVolunteers />} />
           <Route path="/admin/library" element={<AdminLibrary />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin/verifications" element={<AdminVerifications />} />
         </Route>
       </Route>
 

@@ -6,6 +6,7 @@ export function VolunteerRoute() {
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (user?.role !== 'volunteer') return <Navigate to="/" replace />;
+  if (user.status !== 'ACTIVE') return <Navigate to="/login" replace />;
 
   return <Outlet />;
 }

@@ -2,7 +2,6 @@ import { useEffect, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSignupSubmitForm } from '../Hooks/auth/UseSignupSubmitForm';
 import { useAuth } from '../Hooks/auth/UseAuth';
-import { getRoleRedirectPath } from '../lib/roleRedirect';
 import logo from '../assets/logo.png';
 import Select from 'react-select';
 import {
@@ -21,21 +20,23 @@ function Signup() {
 
   useEffect(() => {
     if (user) {
-      navigate(getRoleRedirectPath(user.role), { replace: true });
+      navigate('/login', { replace: true });
     }
   }, [navigate, user]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    const session = await submitForm(event);
+    const result = await submitForm(event);
 
-    if (session) {
-      navigate(getRoleRedirectPath(session.user.role), { replace: true });
+    if (result) {
+      sessionStorage.setItem('pendingVerificationEmail', result.email);
+      sessionStorage.setItem('pendingSignupToken', result.signupToken);
+      navigate('/verify-email', { replace: true, state: { email: result.email } });
     }
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10" dir="rtl">
-      <div className="w-full max-w-sm space-y-8">
+    <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8 sm:px-6" dir="rtl">
+      <div className="w-full max-w-6xl space-y-6">
         {/* Logo */}
         <div className="text-center space-y-2">
           <img src={logo} alt="مشروع مطر" className="h-16 w-auto mx-auto" />
@@ -43,14 +44,19 @@ function Signup() {
           <p className="text-gray-500 text-sm">إنشاء حساب جديد</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm p-8 space-y-5">
+        <div className="bg-white rounded-2xl shadow-sm p-5 sm:p-8 space-y-5">
           {serverError && (
             <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
               {serverError}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5" noValidate aria-label="نموذج إنشاء حساب">
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            noValidate
+            aria-label="نموذج إنشاء حساب"
+          >
             {/* Name */}
             <div className="space-y-1">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -197,9 +203,16 @@ function Signup() {
             </div>
 
             {/* Role */}
-            <div className="space-y-2">
+            <div
+              className={cn(
+                'space-y-2 sm:col-span-2',
+                values.role === 'visually_impired'
+                  ? 'lg:col-span-2'
+                  : 'lg:col-span-3',
+              )}
+            >
               <p className="block text-sm font-medium text-gray-700">نوع الحساب</p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <label
                   className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
                     values.role === 'volunteer'
@@ -245,11 +258,33 @@ function Signup() {
               )}
             </div>
 
+            {values.role === 'visually_impired' && (
+              <div className="space-y-1 sm:col-span-2 lg:col-span-1">
+                <label htmlFor="healthReport" className="block text-sm font-medium text-gray-700">
+                  تقريرك الصحي
+                </label>
+                <input
+                  id="healthReport"
+                  type="file"
+                  required
+                  accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                  onChange={(event) => updateField('healthReport', event.target.files?.[0] ?? null)}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm"
+                />
+                <p className="text-xs text-gray-500">
+                  يرجى رفع تقرير صحي بصيغة PDF أو صورة، وبحجم أقصى 5MB.
+                </p>
+                {errors.healthReport && (
+                  <p className="text-sm text-red-600" role="alert">{errors.healthReport}</p>
+                )}
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={isSubmitting}
               aria-busy={isSubmitting}
-              className="w-full px-4 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed transition-colors min-h-[48px] flex items-center justify-center gap-2"
+              className="sm:col-span-2 lg:col-span-3 w-full px-4 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed transition-colors min-h-[48px] flex items-center justify-center gap-2"
             >
               {isSubmitting && (
                 <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true" />

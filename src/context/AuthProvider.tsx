@@ -25,7 +25,12 @@ function getStoredSession(): AuthSession | null {
   }
 
   try {
-    const user = JSON.parse(storedUser) as AuthUser;
+    const stored = JSON.parse(storedUser) as Partial<AuthUser>;
+    const user = {
+      ...stored,
+      status: stored.status ?? 'ACTIVE',
+      emailVerified: stored.emailVerified ?? true,
+    } as AuthUser;
     logger.info('Session restored from localStorage', { email: user.email, role: user.role });
     return { accessToken, user };
   } catch {
@@ -77,6 +82,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     logger.info('User logged out', { email: session?.user.email });
     try {
       await logoutRequest();
+    } catch (error) {
+      logger.warn('Server logout failed; clearing the local session', error);
     } finally {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
