@@ -10,6 +10,7 @@ export default function Home() {
   const { data: stats } = usePublicStatsQuery();
   const canRequestHelp = user?.role === 'visually_impired';
   const canVolunteer = user?.role === 'volunteer';
+  const isGuest = !user;
 
   return (
     <div>
@@ -50,7 +51,30 @@ export default function Home() {
           <p className="text-xl md:text-2xl text-primary-100 max-w-2xl mx-auto leading-relaxed">
             إعطاء المكفوفين الفرصة التعليمية والثقافية المتكافئة
           </p>
+          {isGuest && (
+            <p className="text-base md:text-lg text-primary-200 max-w-2xl mx-auto leading-relaxed">
+              انضم إلى مطر اليوم — تطوّع أو احصل على المواد التعليمية التي تحتاجها
+            </p>
+          )}
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+            {isGuest && (
+              <>
+                <Link
+                  to="/signup?role=volunteer"
+                  className="px-7 py-4 text-lg font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white bg-white text-primary-600 hover:bg-primary-50 inline-flex items-center justify-center"
+                  aria-label="سجّل كمتطوع في مشروع مطر"
+                >
+                  تطوع معنا
+                </Link>
+                <Link
+                  to="/signup?role=visually_impired"
+                  className="px-7 py-4 text-lg font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white border-2 border-white text-white hover:bg-primary-700 inline-flex items-center justify-center"
+                  aria-label="سجّل كمستفيد في مشروع مطر"
+                >
+                  سجّل كمستفيد
+                </Link>
+              </>
+            )}
             {canRequestHelp && (
               <Link
                 to="/vi/requests"
@@ -183,6 +207,22 @@ export default function Home() {
             سواء كنت تبحث عن مساعدة أو تريد تقديمها — مطر هو مكانك.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
+            {isGuest && (
+              <>
+                <Link
+                  to="/signup?role=volunteer"
+                  className="px-8 py-4 bg-white text-secondary-700 font-semibold rounded-xl hover:bg-secondary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors text-center"
+                >
+                  تطوع معنا
+                </Link>
+                <Link
+                  to="/signup?role=visually_impired"
+                  className="px-8 py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-secondary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors text-center"
+                >
+                  سجّل كمستفيد
+                </Link>
+              </>
+            )}
             {canRequestHelp && (
               <Link
                 to="/vi/requests"
