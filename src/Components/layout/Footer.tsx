@@ -21,7 +21,7 @@ export function Footer() {
             <h3 className="text-white font-semibold mb-3">روابط سريعة</h3>
             <ul className="space-y-2 text-sm" role="list">
               {[
-                { to: '/about', label: 'عن مطر' },
+                { to: '/about', label: 'عن مشروع مطر' },
               ].map((l) => (
                 <li key={l.to}>
                   <Link

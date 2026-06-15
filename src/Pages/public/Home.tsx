@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, Users, CheckCircle, Library } from 'lucide-react';
+import { BookOpen, Users, CheckCircle, Library, Globe, FileText, Award, ExternalLink } from 'lucide-react';
 import { useAuth } from '../../Hooks/auth/UseAuth';
 import { usePublicStatsQuery } from '../../Hooks/public/queries/usePublicStatsQuery';
 import { PublicStatCard } from '../../Components/public/PublicStatCard';
@@ -10,6 +10,7 @@ export default function Home() {
   const { data: stats } = usePublicStatsQuery();
   const canRequestHelp = user?.role === 'visually_impired';
   const canVolunteer = user?.role === 'volunteer';
+  const isGuest = !user;
 
   return (
     <div>
@@ -50,7 +51,30 @@ export default function Home() {
           <p className="text-xl md:text-2xl text-primary-100 max-w-2xl mx-auto leading-relaxed">
             إعطاء المكفوفين الفرصة التعليمية والثقافية المتكافئة
           </p>
+          {isGuest && (
+            <p className="text-base md:text-lg text-primary-200 max-w-2xl mx-auto leading-relaxed">
+              انضم إلى مطر اليوم — تطوّع أو احصل على المواد التعليمية التي تحتاجها
+            </p>
+          )}
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+            {isGuest && (
+              <>
+                <Link
+                  to="/signup?role=volunteer"
+                  className="px-7 py-4 text-lg font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white bg-white text-primary-600 hover:bg-primary-50 inline-flex items-center justify-center"
+                  aria-label="سجّل كمتطوع في مشروع مطر"
+                >
+                  تطوع معنا
+                </Link>
+                <Link
+                  to="/signup?role=visually_impired"
+                  className="px-7 py-4 text-lg font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white border-2 border-white text-white hover:bg-primary-700 inline-flex items-center justify-center"
+                  aria-label="سجّل كمستفيد في مشروع مطر"
+                >
+                  سجّل كمستفيد
+                </Link>
+              </>
+            )}
             {canRequestHelp && (
               <Link
                 to="/vi/requests"
@@ -91,7 +115,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { step: '١', title: 'طلب المساعدة', desc: 'يطلب المستفيد الكتاب أو المادة التعليمية التي يحتاجها عبر نموذج بسيط.' },
-              { step: '٢', title: 'تطوع وتحويل', desc: 'يتولى المتطوعون تسجيل الكتب صوتياً أو تحويلها إلى صيغة نصية سهلة القراءة.' },
+              { step: '٢', title: 'تطوع في التسجيل الصوتي أو التحويل لوورد أو المرافقة', desc: 'يتولى المتطوعون تسجيل الكتب صوتياً أو تحويلها إلى ملفات وورد.' },
               { step: '٣', title: 'إتاحة المواد', desc: 'تُضاف المواد المحوّلة إلى المكتبة لتستفيد منها أوسع شريحة ممكنة.' },
             ].map((item) => (
               <div key={item.step} className="bg-white rounded-xl p-6 shadow-sm text-center space-y-3">
@@ -107,19 +131,34 @@ export default function Home() {
       </section>
 
       {/* Stats */}
-      {stats && (
-        <section className="py-16 px-4 bg-primary-600 text-white" aria-label="إحصاءات المشروع">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-12">أثرنا</h2>
+      <section className="py-16 px-4 bg-primary-600 text-white" aria-label="إحصاءات المشروع">
+        <div className="max-w-5xl mx-auto space-y-12">
+          <h2 className="text-3xl font-bold text-center">المنصة بالأرقام</h2>
+
+          {stats && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <PublicStatCard icon={Users} value={stats.totalVolunteers} label="متطوع" />
               <PublicStatCard icon={BookOpen} value={stats.totalRequests} label="طلب مساعدة" />
               <PublicStatCard icon={CheckCircle} value={stats.completedRequests} label="طلب مكتمل" />
               <PublicStatCard icon={Library} value={stats.libraryItems} label="مادة في المكتبة" />
             </div>
+          )}
+
+          <div className="border-t border-white/20 pt-10 space-y-6">
+            <p className="text-center text-primary-200 font-semibold text-lg">إنجازات 2025</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <PublicStatCard icon={BookOpen} value="1,348" label="كتاب" />
+              <PublicStatCard icon={FileText} value="243,436" label="صفحة" />
+              <PublicStatCard icon={Award} value="8,369" label="فرصة تطوعية" />
+              <PublicStatCard icon={Users} value="82" label="طالب كفيف جديد" />
+              <PublicStatCard icon={Users} value="1,082" label="إجمالي الطلاب المكفوفين" />
+              <PublicStatCard icon={Globe} value="25" label="دولة" />
+              <PublicStatCard icon={CheckCircle} value="112" label="شهادة تطوع" />
+              <PublicStatCard icon={CheckCircle} value="126" label="شهادة شكر" />
+            </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* Stories */}
       <section className="py-16 px-4 bg-white" aria-label="قصص النجاح">
@@ -127,9 +166,24 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">قصص نجاح</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {SUCCESS_STORIES.map((s) => (
-              <blockquote key={s.name} className="bg-gray-50 rounded-xl p-6 space-y-4">
-                <p className="text-gray-700 leading-relaxed">"{s.text}"</p>
-                <footer className="text-sm font-medium text-primary-600">— {s.name}</footer>
+              <blockquote key={s.name} className="bg-gray-50 rounded-xl p-6 flex flex-col gap-4">
+                <p className="text-gray-700 leading-relaxed flex-1">"{s.text}"</p>
+                <footer className="flex items-end justify-between gap-2">
+                  <div>
+                    <div className="text-sm font-semibold text-primary-600">— {s.name}</div>
+                    <div className="text-xs text-gray-400 mt-0.5">{s.achievement}</div>
+                  </div>
+                  <a
+                    href={s.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-xs text-gray-400 hover:text-primary-600 transition-colors shrink-0"
+                    aria-label={`المنشور الأصلي لـ${s.name}`}
+                  >
+                    <ExternalLink size={12} />
+                    المنشور
+                  </a>
+                </footer>
               </blockquote>
             ))}
           </div>
@@ -153,6 +207,22 @@ export default function Home() {
             سواء كنت تبحث عن مساعدة أو تريد تقديمها — مطر هو مكانك.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
+            {isGuest && (
+              <>
+                <Link
+                  to="/signup?role=volunteer"
+                  className="px-8 py-4 bg-white text-secondary-700 font-semibold rounded-xl hover:bg-secondary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors text-center"
+                >
+                  تطوع معنا
+                </Link>
+                <Link
+                  to="/signup?role=visually_impired"
+                  className="px-8 py-4 border-2 border-white text-white font-semibold rounded-xl hover:bg-secondary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors text-center"
+                >
+                  سجّل كمستفيد
+                </Link>
+              </>
+            )}
             {canRequestHelp && (
               <Link
                 to="/vi/requests"
