@@ -2,7 +2,8 @@ import { useEffect, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLoginSubmitForm } from '../Hooks/auth/UseLoginSubmitForm';
 import { useAuth } from '../Hooks/auth/UseAuth';
-import { getRoleRedirectPath } from '../lib/roleRedirect';
+import { getAccountRedirectPath } from '../lib/roleRedirect';
+import { House } from 'lucide-react';
 import logo from '../assets/logo.png';
 
 function Login() {
@@ -12,7 +13,7 @@ function Login() {
 
   useEffect(() => {
     if (user) {
-      navigate(getRoleRedirectPath(user.role), { replace: true });
+      navigate(getAccountRedirectPath(user), { replace: true });
     }
   }, [navigate, user]);
 
@@ -20,12 +21,23 @@ function Login() {
     const session = await submitForm(event);
 
     if (session) {
-      navigate(getRoleRedirectPath(session.user.role), { replace: true });
+      navigate(getAccountRedirectPath(session.user), { replace: true });
     }
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4" dir="rtl">
+    <main className="relative min-h-screen bg-gray-50 flex items-center justify-center px-4" dir="rtl">
+      <Link
+        to="/"
+        aria-label="العودة إلى الصفحة الرئيسية"
+        className="group absolute right-4 top-4 inline-flex h-12 items-center gap-2 rounded-full border border-gray-200 bg-white/90 px-4 text-sm font-semibold text-gray-700 shadow-sm backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-200 hover:bg-white hover:text-primary-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 sm:right-8 sm:top-8"
+      >
+        <span className="grid h-8 w-8 place-items-center rounded-full bg-primary-50 text-primary-700 transition-colors group-hover:bg-primary-100">
+          <House size={17} strokeWidth={2.2} aria-hidden="true" />
+        </span>
+        <span>الرئيسية</span>
+      </Link>
+
       <div className="w-full max-w-sm space-y-8">
         {/* Logo */}
         <div className="text-center space-y-2">

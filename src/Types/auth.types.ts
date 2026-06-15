@@ -11,7 +11,15 @@ export interface SignupRequest {
   city: string;
   password: string;
   role: 'volunteer' | 'visually_impired';
+  healthReport: File | null;
 }
+
+export type AccountStatus =
+  | 'EMAIL_VERIFICATION_PENDING'
+  | 'PENDING_ADMIN_REVIEW'
+  | 'ACTIVE'
+  | 'REJECTED'
+  | 'SUSPENDED';
 
 export interface AuthUser {
   id: number;
@@ -21,11 +29,21 @@ export interface AuthUser {
   country: string | null;
   city: string | null;
   role: string;
+  status: AccountStatus;
+  emailVerified: boolean;
 }
 
 export interface AuthSession {
   user: AuthUser;
   accessToken: string;
+}
+
+export interface SignupResponse {
+  email: string;
+  signupToken: string;
+  accountType: string;
+  status: AccountStatus;
+  message: string;
 }
 
 export interface AuthContextValue {
