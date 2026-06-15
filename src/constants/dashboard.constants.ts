@@ -18,6 +18,7 @@ export const ADMIN_DASHBOARD_CONFIG: DashboardLayoutProps = {
     { to: '/admin', label: 'الرئيسية', icon: LayoutDashboard, end: true },
     { to: '/admin/requests', label: 'الطلبات', icon: FileText },
     { to: '/admin/volunteers', label: 'المتطوعون', icon: Users },
+    { to: '/admin/verifications', label: 'طلبات التحقق', icon: ClipboardList },
     { to: '/admin/library', label: 'المكتبة', icon: Library },
     { to: '/admin/settings', label: 'الإعدادات', icon: Settings },
   ],

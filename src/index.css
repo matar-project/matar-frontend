@@ -106,3 +106,13 @@ html {
   text-align: right;
   z-index: 20 !important;
 }
+
+.signup-country-select .searchable-country__control {
+  min-height: 56px !important;
+  border-radius: 0.75rem !important;
+  background: rgb(249 250 251 / 0.8);
+}
+
+.signup-country-select .searchable-country__value-container {
+  padding-right: 2.75rem !important;
+}

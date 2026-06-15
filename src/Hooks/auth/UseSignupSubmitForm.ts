@@ -1,10 +1,12 @@
 import axios from 'axios';
 import { useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { signup as signupRequest } from '../../api/auth.api';
 import { signupSchema } from '../../schema/signup.schema';
 import type { SignupFieldErrors, SignupRequest } from '../../Types/auth.types';
-import { useAuth } from './UseAuth';
 import { logger } from '../../lib/logger';
+
+const SIGNUP_ROLES: SignupRequest['role'][] = ['volunteer', 'visually_impired'];
 
 const initialValues: SignupRequest = {
   name: '',
@@ -14,7 +16,12 @@ const initialValues: SignupRequest = {
   city: '',
   password: '',
   role: 'volunteer',
+  healthReport: null,
 };
+
+function resolveInitialRole(roleParam: string | null): SignupRequest['role'] {
+  return SIGNUP_ROLES.find((role) => role === roleParam) ?? initialValues.role;
+}
 
 function getServerError(error: unknown): string {
   if (!axios.isAxiosError(error)) return 'حدث خطأ. حاول مرة أخرى.';
@@ -24,13 +31,16 @@ function getServerError(error: unknown): string {
 }
 
 export function useSignupSubmitForm() {
-  const { loginWithSession } = useAuth();
-  const [values, setValues] = useState<SignupRequest>(initialValues);
+  const [searchParams] = useSearchParams();
+  const [values, setValues] = useState<SignupRequest>(() => ({
+    ...initialValues,
+    role: resolveInitialRole(searchParams.get('role')),
+  }));
   const [errors, setErrors] = useState<SignupFieldErrors>({});
   const [serverError, setServerError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function updateField(field: keyof SignupRequest, value: string) {
+  function updateField(field: keyof SignupRequest, value: string | File | null) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
     setServerError('');
@@ -61,6 +71,7 @@ export function useSignupSubmitForm() {
         city: fieldErrors.city?.[0],
         password: fieldErrors.password?.[0],
         role: fieldErrors.role?.[0],
+        healthReport: fieldErrors.healthReport?.[0],
       });
       return;
     }
@@ -70,7 +81,6 @@ export function useSignupSubmitForm() {
 
     try {
       const session = await signupRequest(result.data);
-      loginWithSession(session);
       logger.info('Signup successful', { email: result.data.email, role: result.data.role });
       return session;
     } catch (error) {
