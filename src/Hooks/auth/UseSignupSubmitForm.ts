@@ -1,9 +1,12 @@
 import axios from 'axios';
 import { useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { signup as signupRequest } from '../../api/auth.api';
 import { signupSchema } from '../../schema/signup.schema';
 import type { SignupFieldErrors, SignupRequest } from '../../Types/auth.types';
 import { logger } from '../../lib/logger';
+
+const SIGNUP_ROLES: SignupRequest['role'][] = ['volunteer', 'visually_impired'];
 
 const initialValues: SignupRequest = {
   name: '',
@@ -16,6 +19,10 @@ const initialValues: SignupRequest = {
   healthReport: null,
 };
 
+function resolveInitialRole(roleParam: string | null): SignupRequest['role'] {
+  return SIGNUP_ROLES.find((role) => role === roleParam) ?? initialValues.role;
+}
+
 function getServerError(error: unknown): string {
   if (!axios.isAxiosError(error)) return 'حدث خطأ. حاول مرة أخرى.';
   const message = error.response?.data?.message;
@@ -25,6 +32,12 @@ function getServerError(error: unknown): string {
 
 export function useSignupSubmitForm() {
   const [values, setValues] = useState<SignupRequest>(initialValues);
+  const { loginWithSession } = useAuth();
+  const [searchParams] = useSearchParams();
+  const [values, setValues] = useState<SignupRequest>(() => ({
+    ...initialValues,
+    role: resolveInitialRole(searchParams.get('role')),
+  }));
   const [errors, setErrors] = useState<SignupFieldErrors>({});
   const [serverError, setServerError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
