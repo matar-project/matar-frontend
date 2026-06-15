@@ -31,8 +31,6 @@ function getServerError(error: unknown): string {
 }
 
 export function useSignupSubmitForm() {
-  const [values, setValues] = useState<SignupRequest>(initialValues);
-  const { loginWithSession } = useAuth();
   const [searchParams] = useSearchParams();
   const [values, setValues] = useState<SignupRequest>(() => ({
     ...initialValues,
