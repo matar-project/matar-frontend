@@ -32,6 +32,7 @@ function Signup() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const {
     errors,
     isSubmitting,
@@ -351,6 +352,62 @@ function Signup() {
                   role="alert"
                 >
                   {errors.password}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-semibold text-gray-700"
+              >
+                تأكيد كلمة المرور
+              </label>
+              <div className={fieldClass(Boolean(errors.confirmPassword))}>
+                <span className="grid h-7 w-14 place-items-center border-l border-gray-200 text-gray-400">
+                  <LockKeyhole size={20} aria-hidden="true" />
+                </span>
+                <input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={values.confirmPassword}
+                  onChange={(event) =>
+                    updateField('confirmPassword', event.target.value)
+                  }
+                  placeholder="أعد إدخال كلمة المرور"
+                  autoComplete="new-password"
+                  aria-invalid={Boolean(errors.confirmPassword)}
+                  aria-describedby={
+                    errors.confirmPassword ? 'confirmPassword-error' : undefined
+                  }
+                  className="min-w-0 flex-1 bg-transparent px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowConfirmPassword((current) => !current)
+                  }
+                  aria-label={
+                    showConfirmPassword
+                      ? 'إخفاء كلمة المرور'
+                      : 'إظهار كلمة المرور'
+                  }
+                  className="grid h-12 w-12 place-items-center text-gray-400 transition hover:text-primary-600"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={20} aria-hidden="true" />
+                  ) : (
+                    <Eye size={20} aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p
+                  id="confirmPassword-error"
+                  className="text-sm text-red-600"
+                  role="alert"
+                >
+                  {errors.confirmPassword}
                 </p>
               )}
             </div>
