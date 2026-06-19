@@ -3,18 +3,23 @@ import { useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { signup as signupRequest } from '../../api/auth.api';
 import { signupSchema } from '../../schema/signup.schema';
-import type { SignupFieldErrors, SignupRequest } from '../../Types/auth.types';
+import type {
+  SignupFieldErrors,
+  SignupFormValues,
+  SignupRequest,
+} from '../../Types/auth.types';
 import { logger } from '../../lib/logger';
 
 const SIGNUP_ROLES: SignupRequest['role'][] = ['volunteer', 'visually_impired'];
 
-const initialValues: SignupRequest = {
+const initialValues: SignupFormValues = {
   name: '',
   email: '',
   phone: '',
   country: '',
   city: '',
   password: '',
+  confirmPassword: '',
   role: 'volunteer',
   healthReport: null,
 };
@@ -32,7 +37,7 @@ function getServerError(error: unknown): string {
 
 export function useSignupSubmitForm() {
   const [searchParams] = useSearchParams();
-  const [values, setValues] = useState<SignupRequest>(() => ({
+  const [values, setValues] = useState<SignupFormValues>(() => ({
     ...initialValues,
     role: resolveInitialRole(searchParams.get('role')),
   }));
@@ -40,7 +45,7 @@ export function useSignupSubmitForm() {
   const [serverError, setServerError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function updateField(field: keyof SignupRequest, value: string | File | null) {
+  function updateField(field: keyof SignupFormValues, value: string | File | null) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
     setServerError('');
@@ -70,6 +75,7 @@ export function useSignupSubmitForm() {
         country: fieldErrors.country?.[0],
         city: fieldErrors.city?.[0],
         password: fieldErrors.password?.[0],
+        confirmPassword: fieldErrors.confirmPassword?.[0],
         role: fieldErrors.role?.[0],
         healthReport: fieldErrors.healthReport?.[0],
       });
@@ -80,7 +86,9 @@ export function useSignupSubmitForm() {
     setIsSubmitting(true);
 
     try {
-      const session = await signupRequest(result.data);
+      // confirmPassword is client-only; strip it before sending to the backend.
+      const { confirmPassword: _confirmPassword, ...payload } = result.data;
+      const session = await signupRequest(payload);
       logger.info('Signup successful', { email: result.data.email, role: result.data.role });
       return session;
     } catch (error) {
