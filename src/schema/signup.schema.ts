@@ -30,7 +30,7 @@ export const signupSchema: z.ZodType<SignupFormValues> = z
       .max(72, 'كلمة المرور طويلة جداً')
       .refine(
         (value) => PASSWORD_CHARACTER_CLASSES.filter((pattern) => pattern.test(value)).length >= 3,
-        'يجب أن تحتوي كلمة المرور على 3 على الأقل من: حرف كبير، حرف صغير، رقم، رمز',
+        'كلمة المرور ضعيفة. يجب أن تجمع بين 3 أنواع على الأقل: حرف إنجليزي كبير (A-Z)، حرف إنجليزي صغير (a-z)، رقم (0-9)، رمز خاص (!@#$%).',
       ),
     confirmPassword: z.string().min(1, 'تأكيد كلمة المرور مطلوب'),
     role: z.enum(['volunteer', 'visually_impired']),
