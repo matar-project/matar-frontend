@@ -322,7 +322,7 @@ function Signup() {
                   onChange={(event) =>
                     updateField('password', event.target.value)
                   }
-                  placeholder="8 أحرف على الأقل"
+                  placeholder="أدخل كلمة المرور"
                   autoComplete="new-password"
                   aria-invalid={Boolean(errors.password)}
                   aria-describedby={
