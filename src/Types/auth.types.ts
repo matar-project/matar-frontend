@@ -55,5 +55,8 @@ export interface AuthContextValue {
   logout: () => Promise<void>;
 }
 
+// confirmPassword is a client-only field (never sent to the backend).
+export type SignupFormValues = SignupRequest & { confirmPassword: string };
+
 export type LoginFieldErrors = Partial<Record<keyof LoginRequest, string>>;
-export type SignupFieldErrors = Partial<Record<keyof SignupRequest, string>>;
+export type SignupFieldErrors = Partial<Record<keyof SignupFormValues, string>>;
