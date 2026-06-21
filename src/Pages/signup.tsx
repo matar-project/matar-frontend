@@ -1,11 +1,8 @@
-import { useEffect, useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import Select from 'react-select';
-import {
-  getCountryCallingCode,
-  type Country,
-} from 'react-phone-number-input';
-import PhoneNumberInput from 'react-phone-number-input/input';
+import { useEffect, useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Select from "react-select";
+import { getCountryCallingCode, type Country } from "react-phone-number-input";
+import PhoneNumberInput from "react-phone-number-input/input";
 import {
   BookOpen,
   Building2,
@@ -18,15 +15,15 @@ import {
   Phone,
   Upload,
   UserRound,
-} from 'lucide-react';
-import { AuthPageShell } from '../Components/auth/AuthPageShell';
-import { useSignupSubmitForm } from '../Hooks/auth/UseSignupSubmitForm';
-import { useAuth } from '../Hooks/auth/UseAuth';
-import { cn } from '../lib/utils';
-import { COUNTRY_OPTIONS } from '../constants/signup.constants';
+} from "lucide-react";
+import { AuthPageShell } from "../Components/auth/AuthPageShell";
+import { useSignupSubmitForm } from "../Hooks/auth/UseSignupSubmitForm";
+import { useAuth } from "../Hooks/auth/UseAuth";
+import { cn } from "../lib/utils";
+import { COUNTRY_OPTIONS } from "../constants/signup.constants";
 
 const inputContainer =
-  'flex min-h-14 items-center rounded-xl border bg-gray-50/80 transition focus-within:border-primary-400 focus-within:bg-white focus-within:ring-4 focus-within:ring-primary-50';
+  "flex min-h-14 items-center rounded-xl border bg-gray-50/80 transition focus-within:border-primary-400 focus-within:bg-white focus-within:ring-4 focus-within:ring-primary-50";
 
 function Signup() {
   const navigate = useNavigate();
@@ -47,23 +44,23 @@ function Signup() {
     : undefined;
 
   useEffect(() => {
-    if (user) navigate('/login', { replace: true });
+    if (user) navigate("/login", { replace: true });
   }, [navigate, user]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     const result = await submitForm(event);
     if (!result) return;
 
-    sessionStorage.setItem('pendingVerificationEmail', result.email);
-    sessionStorage.setItem('pendingSignupToken', result.signupToken);
-    navigate('/verify-email', {
+    sessionStorage.setItem("pendingVerificationEmail", result.email);
+    sessionStorage.setItem("pendingSignupToken", result.signupToken);
+    navigate("/verify-email", {
       replace: true,
       state: { email: result.email },
     });
   }
 
   const fieldClass = (hasError: boolean) =>
-    cn(inputContainer, hasError ? 'border-red-400' : 'border-gray-200');
+    cn(inputContainer, hasError ? "border-red-400" : "border-gray-200");
 
   return (
     <AuthPageShell mode="signup">
@@ -111,18 +108,20 @@ function Signup() {
                   id="name"
                   type="text"
                   value={values.name}
-                  onChange={(event) =>
-                    updateField('name', event.target.value)
-                  }
+                  onChange={(event) => updateField("name", event.target.value)}
                   placeholder="محمد أحمد"
                   autoComplete="name"
                   aria-invalid={Boolean(errors.name)}
-                  aria-describedby={errors.name ? 'name-error' : undefined}
+                  aria-describedby={errors.name ? "name-error" : undefined}
                   className="min-w-0 flex-1 bg-transparent px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400"
                 />
               </div>
               {errors.name && (
-                <p id="name-error" className="text-sm text-red-600" role="alert">
+                <p
+                  id="name-error"
+                  className="text-sm text-red-600"
+                  role="alert"
+                >
                   {errors.name}
                 </p>
               )}
@@ -143,14 +142,12 @@ function Signup() {
                   id="email"
                   type="email"
                   value={values.email}
-                  onChange={(event) =>
-                    updateField('email', event.target.value)
-                  }
-                  onBlur={() => validateField('email')}
+                  onChange={(event) => updateField("email", event.target.value)}
+                  onBlur={() => validateField("email")}
                   placeholder="name@example.com"
                   autoComplete="email"
                   aria-invalid={Boolean(errors.email)}
-                  aria-describedby={errors.email ? 'email-error' : undefined}
+                  aria-describedby={errors.email ? "email-error" : undefined}
                   className="min-w-0 flex-1 bg-transparent px-4 py-3 text-left text-gray-900 outline-none placeholder:text-gray-400"
                   dir="ltr"
                 />
@@ -190,20 +187,20 @@ function Signup() {
                     ) ?? null
                   }
                   onChange={(option) => {
-                    updateField('country', option?.value ?? '');
-                    updateField('city', '');
-                    updateField('phone', '');
+                    updateField("country", option?.value ?? "");
+                    updateField("city", "");
+                    updateField("phone", "");
                   }}
                   placeholder="ابحث عن الدولة..."
-                  noOptionsMessage={() => 'لا توجد دولة مطابقة'}
+                  noOptionsMessage={() => "لا توجد دولة مطابقة"}
                   classNamePrefix="searchable-country"
                   className={cn(
-                    'signup-country-select',
-                    errors.country && 'searchable-country-error',
+                    "signup-country-select",
+                    errors.country && "searchable-country-error",
                   )}
                   aria-invalid={Boolean(errors.country)}
                   aria-describedby={
-                    errors.country ? 'country-error' : undefined
+                    errors.country ? "country-error" : undefined
                   }
                 />
               </div>
@@ -233,20 +230,22 @@ function Signup() {
                   id="city"
                   type="text"
                   value={values.city}
-                  onChange={(event) =>
-                    updateField('city', event.target.value)
-                  }
+                  onChange={(event) => updateField("city", event.target.value)}
                   maxLength={30}
-                  placeholder={selectedCountry ? 'عمّان' : 'اختر الدولة أولاً'}
+                  placeholder={selectedCountry ? "عمّان" : "اختر الدولة أولاً"}
                   disabled={!selectedCountry}
                   autoComplete="address-level2"
                   aria-invalid={Boolean(errors.city)}
-                  aria-describedby={errors.city ? 'city-error' : undefined}
+                  aria-describedby={errors.city ? "city-error" : undefined}
                   className="min-w-0 flex-1 bg-transparent px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400 disabled:cursor-not-allowed"
                 />
               </div>
               {errors.city && (
-                <p id="city-error" className="text-sm text-red-600" role="alert">
+                <p
+                  id="city-error"
+                  className="text-sm text-red-600"
+                  role="alert"
+                >
                   {errors.city}
                 </p>
               )}
@@ -260,7 +259,7 @@ function Signup() {
                 رقم الهاتف
               </label>
               <div
-                className={cn(fieldClass(Boolean(errors.phone)), 'px-3')}
+                className={cn(fieldClass(Boolean(errors.phone)), "px-3")}
                 dir="ltr"
               >
                 <Phone
@@ -271,15 +270,15 @@ function Signup() {
                 <span className="border-r border-gray-200 px-3 text-sm text-gray-500">
                   {selectedCountry
                     ? `+${getCountryCallingCode(selectedCountry)}`
-                    : '--'}
+                    : "--"}
                 </span>
                 <PhoneNumberInput
                   id="phone"
                   country={selectedCountry}
                   value={values.phone || undefined}
                   onChange={(value) => {
-                    if (!value || value.replace(/\D/g, '').length <= 15) {
-                      updateField('phone', value ?? '');
+                    if (!value || value.replace(/\D/g, "").length <= 15) {
+                      updateField("phone", value ?? "");
                     }
                   }}
                   className="min-w-0 flex-1 bg-transparent px-3 py-3 text-left text-gray-900 outline-none placeholder:text-gray-400"
@@ -287,10 +286,10 @@ function Signup() {
                   maxLength={16}
                   disabled={!selectedCountry}
                   placeholder={
-                    selectedCountry ? 'رقم الهاتف' : 'اختر الدولة أولاً'
+                    selectedCountry ? "رقم الهاتف" : "اختر الدولة أولاً"
                   }
                   aria-invalid={Boolean(errors.phone)}
-                  aria-describedby={errors.phone ? 'phone-error' : undefined}
+                  aria-describedby={errors.phone ? "phone-error" : undefined}
                 />
               </div>
               {errors.phone && (
@@ -317,16 +316,16 @@ function Signup() {
                 </span>
                 <input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={values.password}
                   onChange={(event) =>
-                    updateField('password', event.target.value)
+                    updateField("password", event.target.value)
                   }
                   placeholder="أدخل كلمة المرور"
                   autoComplete="new-password"
                   aria-invalid={Boolean(errors.password)}
                   aria-describedby={
-                    errors.password ? 'password-error' : undefined
+                    errors.password ? "password-error" : undefined
                   }
                   className="min-w-0 flex-1 bg-transparent px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400"
                 />
@@ -334,7 +333,7 @@ function Signup() {
                   type="button"
                   onClick={() => setShowPassword((current) => !current)}
                   aria-label={
-                    showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'
+                    showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"
                   }
                   className="grid h-12 w-12 place-items-center text-gray-400 transition hover:text-primary-600"
                 >
@@ -418,21 +417,21 @@ function Signup() {
               </legend>
               <div className="grid gap-3 sm:grid-cols-2">
                 <RoleOption
-                  selected={values.role === 'volunteer'}
+                  selected={values.role === "volunteer"}
                   name="volunteer"
                   title="متطوع"
                   description="أساهم في تحويل الكتب والمواد"
                   icon={<HandHeart size={24} aria-hidden="true" />}
-                  onSelect={() => updateField('role', 'volunteer')}
+                  onSelect={() => updateField("role", "volunteer")}
                 />
                 <RoleOption
-                  selected={values.role === 'visually_impired'}
+                  selected={values.role === "visually_impired"}
                   name="visually_impired"
                   title="مستفيد"
                   description="أحتاج مواد تعليمية بصيغة مناسبة"
                   icon={<BookOpen size={24} aria-hidden="true" />}
                   secondary
-                  onSelect={() => updateField('role', 'visually_impired')}
+                  onSelect={() => updateField("role", "visually_impired")}
                 />
               </div>
               {errors.role && (
@@ -442,7 +441,7 @@ function Signup() {
               )}
             </fieldset>
 
-            {values.role === 'visually_impired' && (
+            {values.role === "visually_impired" && (
               <div className="space-y-2 md:col-span-2">
                 <label
                   htmlFor="healthReport"
@@ -453,10 +452,10 @@ function Signup() {
                 <label
                   htmlFor="healthReport"
                   className={cn(
-                    'flex cursor-pointer items-center gap-4 rounded-2xl border border-dashed p-4 transition hover:bg-secondary-50/50',
+                    "flex cursor-pointer items-center gap-4 rounded-2xl border border-dashed p-4 transition hover:bg-secondary-50/50",
                     errors.healthReport
-                      ? 'border-red-400 bg-red-50'
-                      : 'border-secondary-300 bg-secondary-50/30',
+                      ? "border-red-400 bg-red-50"
+                      : "border-secondary-300 bg-secondary-50/30",
                   )}
                 >
                   <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-secondary-100 text-secondary-700">
@@ -464,7 +463,7 @@ function Signup() {
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-semibold text-gray-800">
-                      {values.healthReport?.name ?? 'اختر التقرير الصحي'}
+                      {values.healthReport?.name ?? "اختر التقرير الصحي"}
                     </span>
                     <span className="mt-1 block text-xs leading-5 text-gray-500">
                       PDF أو JPG أو PNG، بحد أقصى 5MB
@@ -480,10 +479,7 @@ function Signup() {
                   required
                   accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
                   onChange={(event) =>
-                    updateField(
-                      'healthReport',
-                      event.target.files?.[0] ?? null,
-                    )
+                    updateField("healthReport", event.target.files?.[0] ?? null)
                   }
                   className="sr-only"
                 />
@@ -507,12 +503,12 @@ function Signup() {
                   aria-hidden="true"
                 />
               )}
-              {isSubmitting ? 'جاري إنشاء الحساب...' : 'إنشاء الحساب'}
+              {isSubmitting ? "جاري إنشاء الحساب..." : "إنشاء الحساب"}
             </button>
           </form>
 
           <p className="mt-7 text-center text-sm text-gray-500">
-            لديك حساب بالفعل؟{' '}
+            لديك حساب بالفعل؟{" "}
             <Link
               to="/login"
               className="font-semibold text-secondary-600 hover:underline"
@@ -528,7 +524,7 @@ function Signup() {
 
 interface RoleOptionProps {
   selected: boolean;
-  name: 'volunteer' | 'visually_impired';
+  name: "volunteer" | "visually_impired";
   title: string;
   description: string;
   icon: React.ReactNode;
@@ -548,12 +544,12 @@ function RoleOption({
   return (
     <label
       className={cn(
-        'flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition',
+        "flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition",
         selected
           ? secondary
-            ? 'border-secondary-500 bg-secondary-50 shadow-sm'
-            : 'border-primary-500 bg-primary-50 shadow-sm'
-          : 'border-gray-200 hover:border-primary-200 hover:bg-gray-50',
+            ? "border-secondary-500 bg-secondary-50 shadow-sm"
+            : "border-primary-500 bg-primary-50 shadow-sm"
+          : "border-gray-200 hover:border-primary-200 hover:bg-gray-50",
       )}
     >
       <input
@@ -566,10 +562,10 @@ function RoleOption({
       />
       <span
         className={cn(
-          'grid h-12 w-12 shrink-0 place-items-center rounded-xl',
+          "grid h-12 w-12 shrink-0 place-items-center rounded-xl",
           secondary
-            ? 'bg-secondary-100 text-secondary-700'
-            : 'bg-primary-100 text-primary-700',
+            ? "bg-secondary-100 text-secondary-700"
+            : "bg-primary-100 text-primary-700",
         )}
       >
         {icon}
